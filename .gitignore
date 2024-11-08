@@ -1,5 +1,5 @@
-.zip
-.md
+*.zip
+*.md
 /build
 /.dart_tool
-.log
+*.log
