@@ -138,7 +138,7 @@ void openCheckout() {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Container(
-                height: height * 0.08,
+          
                 width: double.infinity,
                 decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primary,
@@ -151,7 +151,7 @@ void openCheckout() {
                   padding: const EdgeInsets.all(12),
                   child: Row(
                     children: [
-                      Image.asset('assets/images/Insulin.png'),
+                      Image.asset('assets/images/Insulin.png', height: height * 0.04,),
                       SizedBox(
                         width: width * 0.02,
                       ),
@@ -208,7 +208,7 @@ void openCheckout() {
                                   BorderRadius.all(Radius.circular(5)),
                               color: Theme.of(context).colorScheme.onPrimary),
                           width: width,
-                          height: height * 0.04,
+                          height: height * 0.05,
                           child: Padding(
                             padding: const EdgeInsets.all(8),
                             child: TextField(
@@ -230,24 +230,28 @@ void openCheckout() {
                         ),
                         Align(
                           alignment: Alignment.centerRight,
-                          child: Container(
-                            height: height * 0.04,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5)),
-                                color: Theme.of(context).colorScheme.secondary),
-                            child: TextButton(
-                                onPressed: () {
-                                  totalAmount();
-                                },
+                          child: InkWell(
+                            onTap: () {
+                                       totalAmount();
+                            },
+                            child: Container(
+                                              
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5)),
+                                  color: Theme.of(context).colorScheme.secondary),
+                              child: Padding(
+                                padding:  EdgeInsets.all(10),
                                 child: Text(
                                   'Apply',
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: height * 0.015,
+                                      fontSize: height * 0.014,
                                       fontWeight: FontWeight.w400),
-                                )),
+                                ),
+                              ),
+                            ),
                           ),
                         )
                       ],
@@ -322,21 +326,24 @@ void openCheckout() {
                       ],
                     ),
                     Center(
-                      child: Container(
-                        height: height * 0.04,
-                        decoration: BoxDecoration(
-                            borderRadius:
-                                new BorderRadius.all(new Radius.circular(5)),
-                            color:Theme.of(context).colorScheme.onSecondary),
-                        child: TextButton(
-                          onPressed: () {
-                       openCheckout();
-                          },
-                          child: Text(
-                            'CONTINUE',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w400),
+                      child: InkWell(
+                        onTap: () {
+                                     openCheckout();
+                        },
+                        child: Container(
+                                        
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  new BorderRadius.all(new Radius.circular(5)),
+                              color:Theme.of(context).colorScheme.onSecondary),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Text(
+                              'CONTINUE',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w400),
+                            ),
                           ),
                         ),
                       ),

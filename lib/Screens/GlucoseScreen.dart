@@ -561,7 +561,7 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
               color: AppColor.backgroundColor,
             ),
             child: VirtualKeyboard(
-                height: height * 0.2,
+               height: height * 0.25,
                 //width: 500,
                 textColor: Colors.black,
                 textController: enterBgcontroller,

@@ -48,7 +48,9 @@ class _DeviceSetupScreenState extends State<DeviceSetupScreen> {
 
     _adapterStateStateSubscription =
         FlutterBluePlus.adapterState.listen((state) {
-      _adapterState = state;
+setState(() {
+        _adapterState = state;
+});
       if (state == BluetoothAdapterState.on) {
         onRefresh();
         print('toggle butoon ');
@@ -65,7 +67,12 @@ class _DeviceSetupScreenState extends State<DeviceSetupScreen> {
     });
 
     _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
-      _scanResults = results;
+
+setState(() {
+        _scanResults = results;
+           print('available devices $_scanResults');
+});
+   
 
       if (mounted) {
         setState(() {});
@@ -75,7 +82,9 @@ class _DeviceSetupScreenState extends State<DeviceSetupScreen> {
     });
 
     _isScanningSubscription = FlutterBluePlus.isScanning.listen((state) {
-      _isScanning = state;
+  setState(() {
+        _isScanning = state;
+  });
       if (mounted) {
         setState(() {});
       }
@@ -204,6 +213,7 @@ class _DeviceSetupScreenState extends State<DeviceSetupScreen> {
   }
 
   List<Widget> _buildScanResultTiles(BuildContext context) {
+      print('available devices $_scanResults');
     return _scanResults
         .map((r) => ScanResultTile(
               result: r,
@@ -258,17 +268,17 @@ class _DeviceSetupScreenState extends State<DeviceSetupScreen> {
                 children: [
                   if (_adapterState == BluetoothAdapterState.off)
                     Container(
-                      height: 700,
+                      height: 600,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             Icons.bluetooth,
                             color: Color.fromARGB(255, 255, 255, 255),
-                            size: 150,
+                            size: 120,
                           ),
                           SizedBox(
-                            height: 70,
+                            height: 50,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

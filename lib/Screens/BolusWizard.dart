@@ -59,6 +59,19 @@ class _BolusWizardState extends State<BolusWizard> {
     _loadInitialValue();
   }
 
+  void _notifyUser(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          duration: Duration(milliseconds: 600),
+          backgroundColor: Colors.blue,
+          content: Center(
+              child: Text(
+            message,
+            style: TextStyle(fontSize: 20),
+          ))),
+    );
+  }
+
   Future<void> _saveInitialValue(double value) async {
     double updatedValue = initialInsulinValue + value;
     await prefs.setDouble('dose', updatedValue);
@@ -111,7 +124,7 @@ class _BolusWizardState extends State<BolusWizard> {
           builder: (context, readNotifier, child) {
             Future.delayed(Duration(seconds: 4), () {
               if (readNotifier.getack == true) {
-                       _saveInitialValue(dose);
+                _saveInitialValue(dose);
                 addBolusUnit(activeInsulinController.text, context);
 
                 ins = double.parse(activeInsulinController.text.toString());
@@ -122,7 +135,7 @@ class _BolusWizardState extends State<BolusWizard> {
                   doseHistory.insert(
                       0, DoseEntry(dose: dose, timestamp: DateTime.now()));
                 });
-         
+
                 _saveDoseHistory();
                 Navigator.of(context).pop();
                 _successDialogBox();
@@ -172,18 +185,7 @@ class _BolusWizardState extends State<BolusWizard> {
     );
   }
 
-  void _notifyUser(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          duration: Duration(milliseconds: 600),
-          backgroundColor: Colors.blue,
-          content: Center(
-              child: Text(
-            message,
-            style: TextStyle(fontSize: 17),
-          ))),
-    );
-  }
+
 
   _successDialogBox() {
     return showDialog<void>(
@@ -525,209 +527,213 @@ class _BolusWizardState extends State<BolusWizard> {
                   child: device.getdevice != null
                       ? Buttons(
                           action: () {
-                            // addBolusUnit(activeInsulinController.text, context);
-
-                            // ins = double.parse(
-                            //     activeInsulinController.text.toString());
-                            // dose = ins;
-                            // activeInsulinController.clear();
-                            // // Save dose to history
-                            // setState(() {
-                            //   doseHistory.insert(
-                            //       0,
-                            //       DoseEntry(
-                            //           dose: dose, timestamp: DateTime.now()));
-                            // });
-
-                            // _saveDoseHistory();
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (context) {
-                                return Scaffold(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  body: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                    ),
-                                    height: 650,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    'Recommendation',
-                                                    style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .tertiary,
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 30,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    'Estimated Bolus Units',
-                                                    style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .tertiary,
-                                                      fontSize: 20,
-                                                    ),
-                                                  ),
-                                                  Text(
-                                                    '${dose.toInt()} units',
-                                                    style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .tertiary,
-                                                      fontSize: 25,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 30,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  SizedBox(
-                                                    child: Icon(
-                                                      Icons.info_outline,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .tertiary,
-                                                    ),
-                                                    height: 20,
-                                                  ),
-                                                  SizedBox(
-                                                    child: Text(
-                                                      'There values are calculated on basis of input provided to bolus wizard.',
-                                                      style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .tertiary,
-                                                        fontSize: 10,
-                                                      ),
-                                                    ),
-                                                    width: 300,
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 30,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  SizedBox(
-                                                    child: Icon(
-                                                      Icons.info_outline,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .tertiary,
-                                                    ),
-                                                    height: 20,
-                                                  ),
-                                                  SizedBox(
-                                                    child: Text(
-                                                      'Use the recommended setting after taking the approval from your medical consultant (or doctor)',
-                                                      style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .tertiary,
-                                                        fontSize: 10,
-                                                      ),
-                                                    ),
-                                                    width: 300,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              // widget.onCharacteristicChecked(
-                                              //     char, cmd, false);
-
-                                              Navigator.pop(context);
-                                              _waitingDialogBox();
-
-                                              value.getBLEfunctionaltity(
-                                                  char, cmd, false);
-
-                                              Future.delayed(
-                                                  Duration(seconds: 2), () {
-                                                value.getBLEfunctionaltity(
-                                                    char, cmd, true);
-                                                // widget.onCharacteristicChecked(
-                                                //     char, cmd, true);
-                                              });
-                                            },
-                                            child: Container(
-                                              height: height * 0.06,
-                                              width: width * 0.6,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .tertiary,
-
-                                                // boxShadow: [
-                                                //   BoxShadow(
-                                                //     color: Colors.grey,
-                                                //     blurRadius: 10,
-                                                //   ),
-                                                // ]
-                                              ),
-                                              child: Center(
-                                                  child: Text(
-                                                'DELIVER BOLUS',
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onPrimary,
-                                                    fontSize: height * 0.02),
-                                              )),
+                            activeInsulinController.text.isEmpty ?  _notifyUser('Please Enter Insulin Dose') : showModalBottomSheet(
+                                    context: context,
+                                    builder: (context) {
+                                      return Scaffold(
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        body: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(20),
+                                              topRight: Radius.circular(20),
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
+                                          height: 650,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          'Recommendation',
+                                                          style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .tertiary,
+                                                            fontSize:
+                                                                height * 0.03,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: height * 0.03,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          'Estimated Bolus Units',
+                                                          style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .tertiary,
+                                                            fontSize:
+                                                                height * 0.025,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          '${dose.toInt()} units',
+                                                          style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .tertiary,
+                                                            fontSize:
+                                                                height * 0.025,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: height * 0.03,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        SizedBox(
+                                                          child: Icon(
+                                                            Icons.info_outline,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .tertiary,
+                                                          ),
+                                                          height: height * 0.02,
+                                                        ),
+                                                        SizedBox(
+                                                          child: Text(
+                                                            'There values are calculated on basis of input provided to bolus wizard.',
+                                                            style: TextStyle(
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .tertiary,
+                                                              fontSize: height *
+                                                                  0.015,
+                                                            ),
+                                                          ),
+                                                          width: width * 0.8,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: height * 0.03,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceAround,
+                                                      children: [
+                                                        SizedBox(
+                                                          child: Icon(
+                                                            Icons.info_outline,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .tertiary,
+                                                          ),
+                                                          height: height * 0.02,
+                                                        ),
+                                                        SizedBox(
+                                                          child: Text(
+                                                            'Use the recommended setting after taking the approval from your medical consultant (or doctor)',
+                                                            style: TextStyle(
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .tertiary,
+                                                              fontSize: height *
+                                                                  0.015,
+                                                            ),
+                                                          ),
+                                                          width: width * 0.8,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    // widget.onCharacteristicChecked(
+                                                    //     char, cmd, false);
+
+                                                    Navigator.pop(context);
+                                                    _waitingDialogBox();
+
+                                                    value.getBLEfunctionaltity(
+                                                        char, cmd, false);
+
+                                                    Future.delayed(
+                                                        Duration(seconds: 2),
+                                                        () {
+                                                      value
+                                                          .getBLEfunctionaltity(
+                                                              char, cmd, true);
+                                                      // widget.onCharacteristicChecked(
+                                                      //     char, cmd, true);
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    height: height * 0.06,
+                                                    width: width * 0.6,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .tertiary,
+
+                                                      // boxShadow: [
+                                                      //   BoxShadow(
+                                                      //     color: Colors.grey,
+                                                      //     blurRadius: 10,
+                                                      //   ),
+                                                      // ]
+                                                    ),
+                                                    child: Center(
+                                                        child: Text(
+                                                      'DELIVER BOLUS',
+                                                      style: TextStyle(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .onPrimary,
+                                                          fontSize:
+                                                              height * 0.02),
+                                                    )),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
                           },
                           title: 'CALCULATE',
                         )
@@ -847,7 +853,7 @@ class _BolusWizardState extends State<BolusWizard> {
                 width: 100,
                 height: 30,
                 child: TextField(
-                    readOnly: true,
+                  readOnly: true,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                   ),

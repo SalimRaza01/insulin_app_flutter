@@ -377,6 +377,7 @@ Future<void> addBasal(
   final _sharedPreference = SharedPrefsHelper();
   final dio = Dio();
   final String? userId = await _sharedPreference.getString('userId');
+  print('dosage');
   try {
     final response = await dio.post('$postBasalData/$userId', data: {
       'time': endTimeController,

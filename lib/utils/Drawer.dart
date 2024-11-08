@@ -68,7 +68,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
           child: Container(
             color: Theme.of(context).colorScheme.secondary,
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.all(10),
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [

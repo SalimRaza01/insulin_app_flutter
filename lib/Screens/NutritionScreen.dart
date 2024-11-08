@@ -728,7 +728,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
               height: height * 0.01,
             ),
             Container(
-              height: height * 0.04,
+           height: height * 0.058,
               width: width,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
@@ -739,6 +739,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
               child: TextField(
                 cursorColor: Theme.of(context).colorScheme.onInverseSurface,
                 style: TextStyle(
+                     fontSize: height * 0.018,
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
                 controller: controller,
@@ -750,13 +751,11 @@ class _NutritionScreenState extends State<NutritionScreen> {
                 decoration: InputDecoration(
                   hintText: 'Search Meal',
                   border: InputBorder.none,
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Theme.of(context).colorScheme.onInverseSurface,
-                  ),
+                   prefixIcon:
+                    Icon(Icons.search, color: Color.fromARGB(255, 59, 58, 58), size: height * 0.03,),
                   hintStyle: TextStyle(
                       color: Theme.of(context).colorScheme.onInverseSurface,
-                      fontSize: height * 0.02,
+                      fontSize: height * 0.018,
                       fontWeight: FontWeight.w300),
                 ),
               ),

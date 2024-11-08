@@ -141,8 +141,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     inactiveColor: Theme.of(context)
                                         .colorScheme
                                         .secondaryContainer,
-                                    // height: 30.0,
-                                    width:  width * 0.1,
+                                    height: 25.0,
+                           width: 50.0,
                                     padding: 4.0,
                                     toggleSize: 25.0,
                                     borderRadius: 20.0,

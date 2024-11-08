@@ -89,16 +89,42 @@ class _DevicesScreenState extends State<DevicesScreen> {
                                 ),
                                 child: Column(
                                   children: [
-                                    ListTile(
-                                      shape: Border(),
-                                      title: Text("Disconnect",
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondaryContainer,
-                                            fontWeight: AppColor.lightWeight,
-                                          )),
-                                      trailing: SizedBox(),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                                      value.getdevice!
+                                                          .disconnect();
+                                                      bool isDeviceConnected =
+                                                          false;
+                                                      print(
+                                                          'device is disconnected ');
+                                                      BluetoothDevice?
+                                                          myagvaDevice = null;
+                                                      Provider.of<Deviceprovider>(
+                                                              context,
+                                                              listen: false)
+                                                          .updateDevice(
+                                                              myagvaDevice);
+                                                      Provider.of<Deviceconnection>(
+                                                              context,
+                                                              listen: false)
+                                                          .getDeviceConnection(
+                                                              isDeviceConnected);
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    });
+                                      },
+                                      child: ListTile(
+                                        shape: Border(),
+                                        title: Text("Disconnect",
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .secondaryContainer,
+                                              fontWeight: AppColor.lightWeight,
+                                            )),
+                                        trailing: SizedBox(),
+                                      ),
                                     ),
                                     GestureDetector(
                                       onTap: () {

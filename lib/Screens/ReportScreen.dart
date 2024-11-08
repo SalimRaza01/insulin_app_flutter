@@ -8,7 +8,7 @@ import '../utils/config.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-
+import 'package:intl/intl.dart';
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
 
@@ -58,7 +58,7 @@ class _ReportScreenState extends State<ReportScreen> {
           patientName = data['name'];
           patientAge = data['age'];
           patientGender = data['gender'];
-          reportGenerateDate = data['createdAt'].toString();
+           reportGenerateDate = DateFormat('dd-MM-yyyy').format(DateTime.parse(data['createdAt'].toString()));
         });
       } else {
         throw Exception('Failed to load');
@@ -101,7 +101,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   children: [
                     pw.Text('Generated On : ',
                         style: pw.TextStyle(fontSize: 14)),
-                    pw.Text(reportGenerateDate),
+                    pw.Text(reportGenerateDate, style: pw.TextStyle(fontSize: 14)),
                   ],
                 ),
               ],
@@ -325,7 +325,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               ),
                               SizedBox(height: 10),
                               Text(
-                                reportGenerateDate,
+                             reportGenerateDate,
                                 style: TextStyle(
                                   fontFamily: 'Avenir',
                                   color: Theme.of(context)

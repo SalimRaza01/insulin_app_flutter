@@ -67,6 +67,7 @@ class _BasalWizardState extends State<BasalWizard> {
   }
 
   Future<void> _saveInitialValue(double value) async {
+
     double updatedValue = initialInsulinValue + value;
     await prefs.setDouble('dose', updatedValue);
     print('dosage updated');
@@ -79,6 +80,7 @@ class _BasalWizardState extends State<BasalWizard> {
     double? storedValue = prefs.getDouble('dose');
     setState(() {
       initialInsulinValue = storedValue ?? 0.0;
+      print(initialInsulinValue);
     });
   }
 
@@ -180,6 +182,7 @@ class _BasalWizardState extends State<BasalWizard> {
     return Consumer2<CharacteristicProvider, Deviceprovider>(
         builder: (context, value, device, child) {
       return Scaffold(
+      resizeToAvoidBottomInset: true,
         drawer: AppDrawerNavigation('INSULIN'),
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
         appBar: AppBar(
@@ -456,7 +459,8 @@ class _BasalWizardState extends State<BasalWizard> {
                             context: context,
                             builder: (context) {
                               return Container(
-                                height: height * 0.35,
+                                              color: Theme.of(context).colorScheme.primary,
+                               height: 350,
                                 width: MediaQuery.of(context).size.width,
                                 child: Padding(
                                   padding: const EdgeInsets.all(5.0),
@@ -575,27 +579,27 @@ class _BasalWizardState extends State<BasalWizard> {
                                           border: InputBorder.none,
                                           hintText: '0.0',
                                           hintStyle: TextStyle(
-                                            fontSize: height * 0.018,
+                                
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .onInverseSurface,
                                           )),
                                     ),
                                   ),
-                                  Container(
-                                    height: double.infinity,
-                                    width: width * 0.001,
-                                    color: Colors.grey,
-                                  ),
-                                  SizedBox(
-                                    child: Icon(
-                                      Icons.edit,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .tertiary,
-                                    ),
-                                    height: height * 0.02,
-                                  ),
+                                  // Container(
+                                  //   height: double.infinity,
+                                  //   width: width * 0.001,
+                                  //   color: Colors.grey,
+                                  // ),
+                                  // SizedBox(
+                                  //   child: Icon(
+                                  //     Icons.edit,
+                                  //     color: Theme.of(context)
+                                  //         .colorScheme
+                                  //         .tertiary,
+                                  //   ),
+                                  //   height: height * 0.01,
+                                  // ),
                                 ],
                               ),
                             )),
@@ -611,6 +615,7 @@ class _BasalWizardState extends State<BasalWizard> {
                             context: context,
                             builder: (context) {
                               return Container(
+                                  color: Theme.of(context).colorScheme.primary,
                                 height: 350,
                                 width: MediaQuery.of(context).size.width,
                                 child: Padding(
@@ -740,27 +745,27 @@ class _BasalWizardState extends State<BasalWizard> {
                                           border: InputBorder.none,
                                           hintText: '0.0',
                                           hintStyle: TextStyle(
-                                            fontSize: height * 0.018,
+                                     
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .onInverseSurface,
                                           )),
                                     ),
                                   ),
-                                  Container(
-                                    height: double.infinity,
-                                    width: width * 0.001,
-                                    color: Colors.grey,
-                                  ),
-                                  SizedBox(
-                                    child: Icon(
-                                      Icons.edit,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .tertiary,
-                                    ),
-                                    height: height * 0.02,
-                                  ),
+                                  // Container(
+                                  //   height: double.infinity,
+                                  //   width: width * 0.001,
+                                  //   color: Colors.grey,
+                                  // ),
+                                  // SizedBox(
+                                  //   child: Icon(
+                                  //     Icons.edit,
+                                  //     color: Theme.of(context)
+                                  //         .colorScheme
+                                  //         .tertiary,
+                                  //   ),
+                                  //   height: height * 0.02,
+                                  // ),
                                 ],
                               ),
                             )),
@@ -770,78 +775,83 @@ class _BasalWizardState extends State<BasalWizard> {
                   height: height * 0.03,
                 ),
                 device.getdevice != null
-                    ? Container(
-                        height: height * 0.055,
-                        width: width,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Dosage    ',
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    fontSize: height * 0.018),
-                              ),
-                              Icon(
-                                Icons.info_outline,
-                                color: Theme.of(context).colorScheme.tertiary,
-                              ),
-                              SizedBox(
-                                width: width * 0.3,
-                                child: TextField(
-                                  cursorColor: Theme.of(context)
-                                      .colorScheme
-                                      .onInverseSurface,
-                                  selectionControls:
-                                      CupertinoTextSelectionControls(),
+                    ? InkWell(
+                      onTap: () {
+                        toggleDosageEdit();
+                      },
+                      child: Container(
+                          height: height * 0.055,
+                          width: width,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Dosage    ',
                                   style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onInverseSurface),
-                                  focusNode: dosageFocusNode,
-                                  controller: dosageController,
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  readOnly: !isDosageEditable,
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: '0.0',
-                                      hintStyle: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.tertiary,
+                                      fontSize: height * 0.018),
+                                ),
+                                Icon(
+                                  Icons.info_outline,
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
+                                SizedBox(
+                                  width: width * 0.3,
+                                  child: TextField(
+                                    cursorColor: Theme.of(context)
+                                        .colorScheme
+                                        .onInverseSurface,
+                                    selectionControls:
+                                        CupertinoTextSelectionControls(),
+                                    style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .onInverseSurface,
-                                      )),
-                                ),
-                              ),
-                              Container(
-                                height: double.infinity,
-                                width: width * 0.001,
-                                color: Colors.grey,
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  toggleDosageEdit();
-                                },
-                                child: SizedBox(
-                                  child: Icon(
-                                    Icons.edit,
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
+                                            .onInverseSurface),
+                                    focusNode: dosageFocusNode,
+                                    controller: dosageController,
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.center,
+                                    readOnly: !isDosageEditable,
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: '0.0',
+                                        hintStyle: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onInverseSurface,
+                                        )),
                                   ),
-                                  height: height * 0.02,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ))
+                                // Container(
+                                //   height: double.infinity,
+                                //   width: width * 0.001,
+                                //   color: Colors.grey,
+                                // ),
+                                // GestureDetector(
+                                //   onTap: () {
+                                    
+                                //   },
+                                //   child: SizedBox(
+                                //     child: Icon(
+                                //       Icons.edit,
+                                //       color:
+                                //           Theme.of(context).colorScheme.tertiary,
+                                //     ),
+                                //     height: height * 0.02,
+                                //   ),
+                                // ),
+                              ],
+                            ),
+                          )),
+                    )
                     : inActiveTextFields(context, 'Dosage', height),
                 SizedBox(
                   height: height * 0.03,
@@ -850,9 +860,11 @@ class _BasalWizardState extends State<BasalWizard> {
                   child: device.getdevice != null
                       ? Buttons(
                           action: ()  {
-                            _saveInitialValue(double.parse(dosage));
-                         
-                          addBasal(endTimeController.text, dosage, context);
+                              print('dosage');
+                            _saveInitialValue(double.parse(dosageController.text));
+                                print('dosage 2');
+                          addBasal(endTimeController.text, dosageController.text, context);
+                               
                             DateTime writingStartTime =
                                 DateTime.parse(starttime.toString());
                             DateTime writingEndTime =

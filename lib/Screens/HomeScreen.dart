@@ -118,13 +118,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
+          print('inside scanresult');
       _scanResults = results;
+         print('inside scanresult 2 $results');
       for (ScanResult r in _scanResults) {
-        // print('all devices list ${r.device.platformName}');
+        print('inside scanresult 3 ${r.device.platformName}');
         if (r.device.platformName.contains('AgVa')) {
           agvaDevice = r.device;
 
           if (FlutterBluePlus.isScanningNow) {
+                   print('inside scanresult 4');
             FlutterBluePlus.stopScan();
             Future.delayed(Duration(seconds: 2), () {
               popupDevice(context, agvaDevice!);
@@ -187,14 +190,14 @@ class _HomeScreenState extends State<HomeScreen> {
     _adapterStateStateSubscription.cancel();
     _scanResultsSubscription.cancel();
     _isScanningSubscription.cancel();
-
     super.dispose();
   }
 
   Future onRefresh() {
     print("Scanning is running");
     if (_isScanning == false) {
-      FlutterBluePlus.startScan(timeout: const Duration(seconds: 1));
+               print('Scanning');
+      FlutterBluePlus.startScan(timeout: const Duration(seconds: 3));
     }
     if (mounted) {}
     return Future.delayed(Duration(milliseconds: 500));
@@ -824,12 +827,14 @@ class _HomeScreenState extends State<HomeScreen> {
   String setImage(isDeviceConnected) {
     if (isDeviceConnected) {
       return 'assets/images/insulin_connected.png';
-    } else if (_isScanning) {
+    }   else if (_isScanning) {
       return 'assets/images/scanning.gif';
     } else {
       return 'assets/images/insulinIcon.png';
     }
   }
+
+
 
   void showPopupMenu(BuildContext context) {
     showMenu(
@@ -1061,7 +1066,7 @@ class BloodCount extends StatelessWidget {
                           return StatefulBuilder(builder:
                               (BuildContext context, StateSetter setState) {
                             return Container(
-                              height: height * 0.33,
+                              height: height * 0.36,
                               width: width,
                               child: Padding(
                                 padding: EdgeInsets.all(20),

@@ -10,6 +10,7 @@ import 'package:newproject/utils/CharacteristicProvider.dart';
 import 'package:newproject/utils/Colors.dart';
 import 'package:newproject/utils/DeviceProvider.dart';
 import 'package:newproject/utils/Drawer.dart';
+import 'package:newproject/utils/SmartBolusDelivery.dart';
 import 'package:provider/provider.dart';
 import 'package:virtual_keyboard_multi_language/virtual_keyboard_multi_language.dart';
 
@@ -40,7 +41,7 @@ class _SmartBolusScreenState extends State<SmartBolusScreen>
   String cmd = 'cm+sync';
   String currentView = "enterbg";
   bool navigate = false;
-
+bool delivered = false;
   double calculateTotalCarbs(List<FoodItem> foodItems) {
     double totalCarbs = 0;
 
@@ -68,13 +69,12 @@ class _SmartBolusScreenState extends State<SmartBolusScreen>
   @override
   void initState() {
     super.initState();
-weight = pref.getString('weight')!;
+    weight = pref.getString('weight')!;
     _loadMeals();
     _loadInitialValue();
   }
 
-
-Future<void> _saveInitialValue(double value) async {
+  Future<void> _saveInitialValue(double value) async {
     double updatedValue = initialInsulinValue + value;
     await pref.setDouble('dose', updatedValue);
     print('dosage updated');
@@ -165,212 +165,291 @@ Future<void> _saveInitialValue(double value) async {
               ),
               Visibility(
                 visible: showlist,
-                child: Container(
-                  height: 300,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 30),
-                    child: FutureBuilder<List<FoodItem>>(
-                      future: _getFutureMeal,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError ||
-                            !snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return Align(
-                            alignment: Alignment.topCenter,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 100),
-                              child: Text('Please Add Food First',
-                                  style: TextStyle(color: Colors.white)),
-                            ),
-                          );
-                        } else {
-                          items = snapshot.data!;
+                child: SingleChildScrollView(
+                  child: Container(
+                    height: 300,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 30),
+                      child: FutureBuilder<List<FoodItem>>(
+                        future: _getFutureMeal,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError ||
+                              !snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return Align(
+                              alignment: Alignment.topCenter,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 100),
+                                child: Text('Please Add Food First',
+                                    style: TextStyle(color: Colors.white)),
+                              ),
+                            );
+                          } else {
+                            items = snapshot.data!;
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: AnimationLimiter(
-                              child: ListView.separated(
-                                itemCount: items.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final item = items[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: AnimationLimiter(
+                                child: ListView.separated(
+                                  itemCount: items.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    final item = items[index];
 
-                                  return AnimationConfiguration.staggeredList(
-                                    position: index,
-                                    duration: const Duration(milliseconds: 700),
-                                    child: SlideAnimation(
-                                      verticalOffset: 50.0,
-                                      child: FadeInAnimation(
-                                        child: Dismissible(
-                                          key: ValueKey(item.id),
-                                          direction:
-                                              DismissDirection.endToStart,
-                                          onDismissed: (direction) async {
-                                            try {
-                                            await  deleteMeal(item.id!, context);
-                                              final remove =
-                                                  items.removeAt(index);
-                                              _loadMeals();
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  backgroundColor: Colors.blue,
-                                                  duration: Duration(
-                                                      milliseconds: 500),
-                                                  content: Center(
-                                                    child: Text(
-                                                      "${item.foodName} Removed",
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 15),
+                                    return AnimationConfiguration.staggeredList(
+                                      position: index,
+                                      duration:
+                                          const Duration(milliseconds: 700),
+                                      child: SlideAnimation(
+                                        verticalOffset: 50.0,
+                                        child: FadeInAnimation(
+                                          child: Dismissible(
+                                            key: ValueKey(item.id),
+                                            direction:
+                                                DismissDirection.endToStart,
+                                            onDismissed: (direction) async {
+                                              try {
+                                                await deleteMeal(
+                                                    item.id!, context);
+                                                final remove =
+                                                    items.removeAt(index);
+                                                _loadMeals();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    backgroundColor:
+                                                        Colors.blue,
+                                                    duration: Duration(
+                                                        milliseconds: 500),
+                                                    content: Center(
+                                                      child: Text(
+                                                        "${item.foodName} Removed",
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 15),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              );
-                                            } catch (error) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  backgroundColor: Colors.red,
-                                                  content: Center(
-                                                    child: Text(
-                                                      "Failed to remove ${item.foodName}",
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 15),
+                                                );
+                                              } catch (error) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    backgroundColor: Colors.red,
+                                                    content: Center(
+                                                      child: Text(
+                                                        "Failed to remove ${item.foodName}",
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 15),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              );
-                                            }
-                                          },
-                                          background: Container(
-                                            color: Colors.red,
-                                            alignment: Alignment.centerRight,
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 20),
-                                            child: Icon(
-                                              Icons.delete,
-                                              color: Colors.white,
+                                                );
+                                              }
+                                            },
+                                            background: Container(
+                                              color: Colors.red,
+                                              alignment: Alignment.centerRight,
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 20),
+                                              child: Icon(
+                                                Icons.delete,
+                                                color: Colors.white,
+                                              ),
                                             ),
-                                          ),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: Colors.white,
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(10),
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Row(
-                                                        children: [
-                                                          Image.asset(
-                                                              'assets/images/diet.png',
-                                                              height: 35),
-                                                          SizedBox(
-                                                              width:
-                                                                  width * 0.02),
-                                                          Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              SizedBox(
-                                                                width:
-                                                                    width * 0.4,
-                                                                child: Text(
-                                                                  item.foodName ??
-                                                                      "",
-                                                                  maxLines: 2,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        AppColor
-                                                                            .weight600,
-                                                                    color: Color
-                                                                        .fromARGB(
-                                                                            255,
-                                                                            59,
-                                                                            58,
-                                                                            58),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                  'Quantity : ${(double.parse(item.quantity!)).toInt()}',
-                                                                  style: TextStyle(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.white,
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            Image.asset(
+                                                                'assets/images/diet.png',
+                                                                height: 35),
+                                                            SizedBox(
+                                                                width: width *
+                                                                    0.02),
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                SizedBox(
+                                                                  width: width *
+                                                                      0.4,
+                                                                  child: Text(
+                                                                    item.foodName ??
+                                                                        "",
+                                                                    maxLines: 2,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          AppColor
+                                                                              .weight600,
                                                                       color: Color.fromARGB(
                                                                           255,
                                                                           59,
                                                                           58,
                                                                           58),
-                                                                      fontSize:
-                                                                          12)),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Container(
-                                                        width: width * 0.3,
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            IconButton(
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .remove_circle,
-                                                                color: AppColor
-                                                                    .appbarColor,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                    'Quantity : ${(double.parse(item.quantity!)).toInt()}',
+                                                                    style: TextStyle(
+                                                                        color: Color.fromARGB(
+                                                                            255,
+                                                                            59,
+                                                                            58,
+                                                                            58),
+                                                                        fontSize:
+                                                                            12)),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Container(
+                                                          width: width * 0.3,
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              IconButton(
+                                                                icon: Icon(
+                                                                  Icons
+                                                                      .remove_circle,
+                                                                  color: AppColor
+                                                                      .appbarColor,
+                                                                ),
+                                                                onPressed:
+                                                                    () async {
+                                                                  double
+                                                                      carbsPerServing;
+                                                                  try {
+                                                                    carbsPerServing = double.parse(item
+                                                                        .carbs_per_unit!
+                                                                        .replaceAll(
+                                                                            RegExp(r'[^0-9.]'),
+                                                                            ''));
+                                                                  } catch (e) {
+                                                                    print(
+                                                                        'Error parsing carbs as number: $e');
+                                                                    carbsPerServing =
+                                                                        0;
+                                                                  }
+
+                                                                  double
+                                                                      enteredQuantity;
+                                                                  try {
+                                                                    enteredQuantity =
+                                                                        double.parse(
+                                                                            item.quantity!);
+                                                                  } catch (e) {
+                                                                    print(
+                                                                        'Error parsing quantity as number: $e');
+                                                                    enteredQuantity =
+                                                                        1;
+                                                                  }
+
+                                                                  if (enteredQuantity >
+                                                                      1) {
+                                                                    setState(
+                                                                        () {
+                                                                      enteredQuantity--;
+                                                                      item.quantity =
+                                                                          enteredQuantity
+                                                                              .toString();
+                                                                    });
+
+                                                                    double
+                                                                        newCarbs =
+                                                                        carbsPerServing *
+                                                                            enteredQuantity;
+                                                                    await updateQuantity(
+                                                                        item.id,
+                                                                        enteredQuantity,
+                                                                        newCarbs);
+
+                                                                    _loadMeals();
+                                                                    _notifyUser(
+                                                                        'Quantity reduced');
+                                                                  } else {
+                                                                    _notifyUser(
+                                                                        'Quantity cannot be less than 1');
+                                                                  }
+                                                                },
                                                               ),
-                                                              onPressed:
-                                                                  () async {
-                                                                double
-                                                                    carbsPerServing;
-                                                                try {
-                                                                  carbsPerServing = double.parse(item
-                                                                      .carbs_per_unit!
-                                                                      .replaceAll(
-                                                                          RegExp(
-                                                                              r'[^0-9.]'),
-                                                                          ''));
-                                                                } catch (e) {
-                                                                  print(
-                                                                      'Error parsing carbs as number: $e');
-                                                                  carbsPerServing =
-                                                                      0;
-                                                                }
+                                                              Text(
+                                                                '${(double.parse(item.quantity!)).toInt()}',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          59,
+                                                                          58,
+                                                                          58),
+                                                                ),
+                                                              ),
+                                                              IconButton(
+                                                                icon: Icon(
+                                                                  Icons
+                                                                      .add_circle,
+                                                                  color: AppColor
+                                                                      .appbarColor,
+                                                                ),
+                                                                onPressed:
+                                                                    () async {
+                                                                  double
+                                                                      carbsPerServing;
+                                                                  try {
+                                                                    carbsPerServing = double.parse(item
+                                                                        .carbs_per_unit!
+                                                                        .replaceAll(
+                                                                            RegExp(r'[^0-9.]'),
+                                                                            ''));
+                                                                  } catch (e) {
+                                                                    print(
+                                                                        'Error  while parsing carbs $e');
+                                                                    carbsPerServing =
+                                                                        0;
+                                                                  }
 
-                                                                double
-                                                                    enteredQuantity;
-                                                                try {
-                                                                  enteredQuantity =
-                                                                      double.parse(
-                                                                          item.quantity!);
-                                                                } catch (e) {
-                                                                  print(
-                                                                      'Error parsing quantity as number: $e');
-                                                                  enteredQuantity =
-                                                                      1;
-                                                                }
+                                                                  double
+                                                                      enteredQuantity;
+                                                                  try {
+                                                                    enteredQuantity =
+                                                                        double.parse(
+                                                                            item.quantity!);
+                                                                  } catch (e) {
+                                                                    print(
+                                                                        'Error parsing quantity as number: $e');
+                                                                    enteredQuantity =
+                                                                        1;
+                                                                  }
 
-                                                                if (enteredQuantity >
-                                                                    1) {
                                                                   setState(() {
-                                                                    enteredQuantity--;
+                                                                    enteredQuantity++;
                                                                     item.quantity =
                                                                         enteredQuantity
                                                                             .toString();
@@ -387,105 +466,32 @@ Future<void> _saveInitialValue(double value) async {
 
                                                                   _loadMeals();
                                                                   _notifyUser(
-                                                                      'Quantity reduced');
-                                                                } else {
-                                                                  _notifyUser(
-                                                                      'Quantity cannot be less than 1');
-                                                                }
-                                                              },
-                                                            ),
-                                                            Text(
-                                                              '${(double.parse(item.quantity!)).toInt()}',
-                                                              style: TextStyle(
-                                                                color: Color
-                                                                    .fromARGB(
-                                                                        255,
-                                                                        59,
-                                                                        58,
-                                                                        58),
+                                                                      'Quantity added');
+                                                                },
                                                               ),
-                                                            ),
-                                                            IconButton(
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .add_circle,
-                                                                color: AppColor
-                                                                    .appbarColor,
-                                                              ),
-                                                              onPressed:
-                                                                  () async {
-                                                                double
-                                                                    carbsPerServing;
-                                                                try {
-                                                                  carbsPerServing = double.parse(item
-                                                                      .carbs_per_unit!
-                                                                      .replaceAll(
-                                                                          RegExp(
-                                                                              r'[^0-9.]'),
-                                                                          ''));
-                                                                } catch (e) {
-                                                                  print(
-                                                                      'Error  while parsing carbs $e');
-                                                                  carbsPerServing =
-                                                                      0;
-                                                                }
-
-                                                                double
-                                                                    enteredQuantity;
-                                                                try {
-                                                                  enteredQuantity =
-                                                                      double.parse(
-                                                                          item.quantity!);
-                                                                } catch (e) {
-                                                                  print(
-                                                                      'Error parsing quantity as number: $e');
-                                                                  enteredQuantity =
-                                                                      1;
-                                                                }
-
-                                                                setState(() {
-                                                                  enteredQuantity++;
-                                                                  item.quantity =
-                                                                      enteredQuantity
-                                                                          .toString();
-                                                                });
-
-                                                                double
-                                                                    newCarbs =
-                                                                    carbsPerServing *
-                                                                        enteredQuantity;
-                                                                await updateQuantity(
-                                                                    item.id,
-                                                                    enteredQuantity,
-                                                                    newCarbs);
-
-                                                                _loadMeals();
-                                                                _notifyUser(
-                                                                    'Quantity added');
-                                                              },
-                                                            ),
-                                                          ],
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
-                                separatorBuilder: (context, index) {
-                                  return SizedBox(height: height * 0.015);
-                                },
+                                    );
+                                  },
+                                  separatorBuilder: (context, index) {
+                                    return SizedBox(height: height * 0.015);
+                                  },
+                                ),
                               ),
-                            ),
-                          );
-                        }
-                      },
+                            );
+                          }
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -495,7 +501,11 @@ Future<void> _saveInitialValue(double value) async {
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
                   curve: Curves.easeIn,
-                  height: navigate ? height * 0.82 : height * 0.65,
+                  height: currentView == 'calculatedInsulValue'
+                      ? height * 0.50
+                      : navigate
+                          ? (showlist ? height * 0.40 : height * 0.82)
+                          : height * 0.65,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -523,7 +533,6 @@ Future<void> _saveInitialValue(double value) async {
       },
     );
   }
-
 
   Widget enterbg(double height, double width, BuildContext context) {
     return Column(
@@ -558,6 +567,7 @@ Future<void> _saveInitialValue(double value) async {
                 child: Padding(
                   padding: EdgeInsets.all(8.0),
                   child: TextField(
+                    readOnly: true,
                     style: TextStyle(color: Color.fromARGB(255, 59, 58, 58)),
                     controller: _bgController,
                     textAlign: TextAlign.start,
@@ -595,8 +605,8 @@ Future<void> _saveInitialValue(double value) async {
                     child: Center(
                         child: Text(
                       'NEXT',
-                      style:
-                          TextStyle(color: Colors.white, fontSize: height * 0.015),
+                      style: TextStyle(
+                          color: Colors.white, fontSize: height * 0.015),
                     )),
                   ),
                 ),
@@ -604,27 +614,24 @@ Future<void> _saveInitialValue(double value) async {
             ],
           ),
         ),
-         Container(
-            decoration: BoxDecoration(
-           
-                          color: AppColor.backgroundColor,
-            ),
-              
-                    child: VirtualKeyboard(
-                        height: 300,
-                        //width: 500,
-                        textColor: Colors.black,
-                        textController: _bgController,
-                        //customLayoutKeys: _customLayoutKeys,
-                        defaultLayouts: [
-                          VirtualKeyboardDefaultLayouts.Arabic,
-                          VirtualKeyboardDefaultLayouts.English
-                        ],
-                        //reverseLayout :true,
-                        type: VirtualKeyboardType.Numeric,
-                     
-             ),
-                  )
+        Container(
+          decoration: BoxDecoration(
+            color: AppColor.backgroundColor,
+          ),
+          child: VirtualKeyboard(
+            height: height * 0.25,
+            //width: 500,
+            textColor: Colors.black,
+            textController: _bgController,
+            //customLayoutKeys: _customLayoutKeys,
+            defaultLayouts: [
+              VirtualKeyboardDefaultLayouts.Arabic,
+              VirtualKeyboardDefaultLayouts.English
+            ],
+            //reverseLayout :true,
+            type: VirtualKeyboardType.Numeric,
+          ),
+        )
       ],
     );
   }
@@ -663,7 +670,6 @@ Future<void> _saveInitialValue(double value) async {
                   _searchMealController.clear();
                   setState(() {
                     showlist = true;
-                    navigate = false;
 
                     currentView = "calculatedValue";
                   });
@@ -679,7 +685,7 @@ Future<void> _saveInitialValue(double value) async {
             height: height * 0.02,
           ),
           Container(
-            height: height * 0.05,
+            height: height * 0.058,
             width: width,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
@@ -700,8 +706,11 @@ Future<void> _saveInitialValue(double value) async {
               decoration: InputDecoration(
                 hintText: 'Search Meal',
                 border: InputBorder.none,
-                prefixIcon:
-                    Icon(Icons.search, color: Color.fromARGB(255, 59, 58, 58)),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Color.fromARGB(255, 59, 58, 58),
+                  size: height * 0.03,
+                ),
                 hintStyle: TextStyle(
                     fontSize: height * 0.018,
                     fontWeight: FontWeight.w300,
@@ -813,7 +822,7 @@ Future<void> _saveInitialValue(double value) async {
                                           child: TextField(
                                             style: TextStyle(
                                               color: Color.fromARGB(
-                                                        255, 100, 100, 100),
+                                                  255, 100, 100, 100),
                                             ),
                                             controller: _quantityController,
                                             maxLines: 1,
@@ -822,8 +831,8 @@ Future<void> _saveInitialValue(double value) async {
                                             decoration: InputDecoration(
                                               hintText: '1',
                                               hintStyle: TextStyle(
-                                               color: Color.fromARGB(
-                                                        255, 100, 100, 100),
+                                                color: Color.fromARGB(
+                                                    255, 100, 100, 100),
                                               ),
                                               border: InputBorder.none,
                                             ),
@@ -1025,18 +1034,16 @@ Future<void> _saveInitialValue(double value) async {
                                               double newCarbs =
                                                   carbs * enteredQuantity;
 
-                                             
-
                                               await addMeal(item, quantity,
                                                   newCarbs, carbs, context);
                                               _loadMeals();
                                               _searchMealController.clear();
 
                                               _notifyUser('FOOD LOGGED');
-                                              
-                                               setState(() {
+
+                                              setState(() {
                                                 addedFood = true;
-                                                navigate = false;
+
                                                 showlist = true;
                                                 currentView = "calculatedValue";
                                               });
@@ -1406,7 +1413,7 @@ Future<void> _saveInitialValue(double value) async {
       return Padding(
         padding: EdgeInsets.all(20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1436,12 +1443,14 @@ Future<void> _saveInitialValue(double value) async {
                 ),
               ],
             ),
-            SizedBox(
-              height: height * 0.04,
-            ),
-            Image.asset(
-              'assets/images/drop.png',
-              height: height * 0.15,
+            AnimatedContainer(
+              height: currentView == 'calculatedInsulValue'
+                  ? height * 0.15
+                  : height * 0.0,
+              duration: Duration(milliseconds: 2000),
+              child: Image.asset(
+                'assets/images/drop.png',
+              ),
             ),
             RichText(
               text: TextSpan(
@@ -1449,28 +1458,37 @@ Future<void> _saveInitialValue(double value) async {
                   TextSpan(
                       text: '50',
                       style: TextStyle(
-                          fontSize: 50,
+                          fontSize: height * 0.05,
                           color: Color.fromARGB(255, 100, 100, 100),
                           fontWeight: AppColor.weight600)),
                   TextSpan(
                       text: " unit",
-                      style: TextStyle(color: Colors.black, fontSize: 20))
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: height * 0.02,
+                      ))
                 ],
               ),
             ),
-            SizedBox(
-              height: 60,
-            ),
-            Center(
-              child: GestureDetector(
+            Consumer<SmartBolusDelivery>(
+               builder: (context, value, child) {
+            if (value.sbolusStatus == true) {
+              Future.delayed(Duration(milliseconds: 1500),(){
+                setState(() {
+                  delivered = false;
+                        Provider.of<SmartBolusDelivery>(context, listen: false)
+          .updateSmartBolusValue(false);
+      
+                });
+              });
+            }
+            return GestureDetector(
                 onTap: () async {
-                   smartBolusApi('2.0', context);
-                 await  _saveInitialValue(2.0);
-                  Navigator.pop(context);
+                  smartBolusApi('2.0', context);
+                  await _saveInitialValue(2.0);
+                       delivered = true;
                 },
                 child: Container(
-                  height: height * 0.05,
-                  width: width * 0.3,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: const Color.fromARGB(255, 5, 53, 93),
@@ -1478,15 +1496,17 @@ Future<void> _saveInitialValue(double value) async {
                       color: Color.fromARGB(255, 255, 255, 255),
                     ),
                   ),
-                  child: Center(
-                      child: Text(
-                    'NEXT',
-                    style: TextStyle(
-                        color: Colors.white, fontSize: height * 0.015),
-                  )),
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Text(
+                     delivered ?  'DELIVERING' : 'DELIVER SMART BOLUS',
+                      style: TextStyle(
+                          color: Colors.white, fontSize: height * 0.015),
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+     }, ),
           ],
         ),
       );

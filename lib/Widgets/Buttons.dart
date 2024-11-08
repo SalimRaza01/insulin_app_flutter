@@ -14,7 +14,7 @@ class Buttons extends StatelessWidget {
         final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Center(
-      child: GestureDetector(
+      child: InkWell(
         onTap: action,
         child: Container(
           height: height * 0.06,
