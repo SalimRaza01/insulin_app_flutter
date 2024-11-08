@@ -64,11 +64,11 @@ class OtpProvider with ChangeNotifier {
       print('asda');
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-
+print("login response $data");
         String id = data["data"]["_id"];
         bool isProfileCompleted = data['data']['isProfileCompleted'];
         bool isDeviceSetup = data['data']['isDeviceSetup'];
-        print(data);
+   
         _sharedPreference.putString('userId', id);
         _sharedPreference.putBool("isLoggedIn", true);
         _sharedPreference.putBool('isProfileCompleted', isProfileCompleted);

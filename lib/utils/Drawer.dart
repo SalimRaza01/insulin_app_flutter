@@ -5,7 +5,7 @@ import 'package:newproject/Screens/BolusWizard.dart';
 import 'package:newproject/Screens/BuySubscription.dart';
 import 'package:newproject/Screens/DevicesScreen.dart';
 import 'package:newproject/Screens/ProfileScreen.dart';
-import 'package:newproject/Screens/Report.dart';
+import 'package:newproject/Screens/ReportScreen.dart';
 import 'package:newproject/Screens/SettingsScreen.dart';
 import 'package:newproject/Screens/HomeScreen.dart';
 import 'package:newproject/Screens/SmartbolusScreen.dart';

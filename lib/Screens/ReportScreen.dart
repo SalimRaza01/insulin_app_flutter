@@ -1,6 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:newproject/utils/Colors.dart';
 import 'package:newproject/utils/Drawer.dart';
+import '../utils/SharedPrefsHelper.dart';
+import '../utils/config.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -14,6 +21,161 @@ class _ReportScreenState extends State<ReportScreen> {
   String _selectedText = 'WEEKLY';
   Color? activeColor;
   Color? activeText;
+  String totalInsulValue = '';
+  String totalGlucoseValue = '';
+  String totalBasalValue = '';
+  String totalBolusValue = '';
+  String patientName = '';
+  String patientAge = '';
+  String patientGender = '';
+  String reportGenerateDate = '';
+
+  @override
+  void initState() {
+    super.initState();
+    getReportDetails(_selectedText);
+  }
+
+  Future<void> getReportDetails(String filterName) async {
+    final dio = Dio();
+    final _sharedPreference = SharedPrefsHelper();
+    final String? userId = await _sharedPreference.getString('userId');
+    try {
+      final response = await dio.get(
+        '$getReportData/$userId',
+        queryParameters: {'filter': filterName.toLowerCase()},
+      );
+
+      if (response.statusCode == 200) {
+        print('Get Report Data for $filterName');
+        var data = response.data['data'][0];
+        print(data);
+        setState(() {
+          totalBasalValue = data['basalSum'].toString();
+          totalBolusValue = data['bolusSum'].toString();
+          totalGlucoseValue = data['glucoseSum'].toString();
+          totalInsulValue = data['insulinSum'].toString();
+          patientName = data['name'];
+          patientAge = data['age'];
+          patientGender = data['gender'];
+          reportGenerateDate = data['createdAt'].toString();
+        });
+      } else {
+        throw Exception('Failed to load');
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+      rethrow;
+    }
+  }
+
+
+  Future<void> downloadPDF() async {
+    print('button hit for download');
+    final pdf = pw.Document();
+
+    final Uint8List assetImage = await rootBundle
+        .load('assets/images/INSUL-4.png')
+        .then((data) => data.buffer.asUint8List());
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Image(
+                pw.MemoryImage(
+                  assetImage,
+                ),
+                width: 110,
+                fit: pw.BoxFit.fitWidth),
+                  pw.SizedBox(height: 15),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text('$_selectedText REPORT',
+                    style: pw.TextStyle(
+                      fontSize: 14,
+                    )),
+                pw.Row(
+                  children: [
+                    pw.Text('Generated On : ',
+                        style: pw.TextStyle(fontSize: 14)),
+                    pw.Text(reportGenerateDate),
+                  ],
+                ),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text('DEMOGRAPHIC DETAILS', style: pw.TextStyle(fontSize: 18)),
+            pw.SizedBox(height: 10),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text('Patient Name', style: pw.TextStyle(fontSize: 14)),
+                pw.Text(patientName),
+              ],
+            ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text('Patient Age', style: pw.TextStyle(fontSize: 14)),
+                pw.Text(patientAge),
+              ],
+            ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text('Gender', style: pw.TextStyle(fontSize: 14)),
+                pw.Text(patientGender),
+              ],
+            ),
+            pw.SizedBox(height: 20),
+            pw.Text('INSULIN REPORT OVERVIEW',
+                style: pw.TextStyle(fontSize: 18)),
+            pw.SizedBox(height: 10),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text('Total Glucose Level:',
+                    style: pw.TextStyle(fontSize: 14)),
+                pw.Text(totalGlucoseValue),
+              ],
+            ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text('Total Insulin Delivered:',
+                    style: pw.TextStyle(fontSize: 14)),
+                pw.Text(totalInsulValue),
+              ],
+            ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text('Total Bolus Delivered:',
+                    style: pw.TextStyle(fontSize: 14)),
+                pw.Text(totalBolusValue),
+              ],
+            ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text('Total Basal Delivered:',
+                    style: pw.TextStyle(fontSize: 14)),
+                pw.Text(totalBasalValue),
+              ],
+            ),
+            
+          ],
+        ),
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +292,7 @@ class _ReportScreenState extends State<ReportScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '-',
+                                patientName,
                                 style: TextStyle(
                                   fontFamily: 'Avenir',
                                   color: Theme.of(context)
@@ -141,7 +303,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               ),
                               SizedBox(height: 10),
                               Text(
-                                '-',
+                                patientAge,
                                 style: TextStyle(
                                   fontFamily: 'Avenir',
                                   color: Theme.of(context)
@@ -152,7 +314,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               ),
                               SizedBox(height: 10),
                               Text(
-                                '-',
+                                patientGender,
                                 style: TextStyle(
                                   fontFamily: 'Avenir',
                                   color: Theme.of(context)
@@ -163,7 +325,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               ),
                               SizedBox(height: 10),
                               Text(
-                                '-',
+                                reportGenerateDate,
                                 style: TextStyle(
                                   fontFamily: 'Avenir',
                                   color: Theme.of(context)
@@ -248,7 +410,7 @@ class _ReportScreenState extends State<ReportScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '-',
+                                totalGlucoseValue,
                                 style: TextStyle(
                                   fontFamily: 'Avenir',
                                   color: Theme.of(context)
@@ -259,7 +421,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               ),
                               SizedBox(height: 10),
                               Text(
-                                '-',
+                                totalInsulValue,
                                 style: TextStyle(
                                   fontFamily: 'Avenir',
                                   color: Theme.of(context)
@@ -270,7 +432,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               ),
                               SizedBox(height: 10),
                               Text(
-                                '-',
+                                totalBolusValue,
                                 style: TextStyle(
                                   fontFamily: 'Avenir',
                                   color: Theme.of(context)
@@ -281,7 +443,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               ),
                               SizedBox(height: 10),
                               Text(
-                                '-',
+                                totalBasalValue,
                                 style: TextStyle(
                                   fontFamily: 'Avenir',
                                   color: Theme.of(context)
@@ -296,12 +458,12 @@ class _ReportScreenState extends State<ReportScreen> {
                       ),
                     ),
                   ),
-                     SizedBox(
+                  SizedBox(
                     height: height * 0.04,
                   ),
                   Center(
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: downloadPDF,
                       child: Container(
                         height: height * 0.045,
                         width: width * 0.35,
@@ -343,6 +505,7 @@ class _ReportScreenState extends State<ReportScreen> {
       onTap: () {
         setState(() {
           _selectedText = text;
+          getReportDetails(_selectedText);
         });
       },
       child: Container(

@@ -776,17 +776,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             shape: BoxShape.circle,
                           ),
                           child: _image == null
-                              ? Image.asset(
-                                  'assets/images/avatar.png',
-                                  width: width * 0.10,
-                                  fit: BoxFit.cover,
+                              ? ClipOval(
+                                  child: Image.asset(
+                                    'assets/images/avatar.png',
+                                    height: height * 0.15,
+                                    fit: BoxFit.contain,
+                                  ),
                                 )
                               : ClipOval(
                                   child: Image.file(
                                     _image!,
-                                    width: width * 0.10,
                                     height: height * 0.13,
-                                    fit: BoxFit.cover,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
                         ),

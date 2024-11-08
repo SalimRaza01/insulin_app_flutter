@@ -324,7 +324,8 @@ Future<void> addGlucoseUnit(String unit, BuildContext context) async {
     if (response.statusCode == 200) {
       print('delivered glucose unit $unit');
       insulinUnit(_sharedPreference.getDouble('dose').toString(), context);
-      print(' delivered insul value ${_sharedPreference.getDouble('dose').toString()}');
+      print(
+          ' delivered insul value ${_sharedPreference.getDouble('dose').toString()}');
       print('API HIT GLUCOSE ADDED');
 
       Provider.of<GlucoseDelivery>(context, listen: false).glucoseUpdate(true);
@@ -455,3 +456,5 @@ Future<void> insulinUnit(String unit, BuildContext context) async {
     print(e);
   }
 }
+
+

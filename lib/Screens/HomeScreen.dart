@@ -480,12 +480,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 GestureDetector(
                     onTap: () {
-            
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => WeightScreen()));
-        
                     },
                     child: WeightChart()),
 
@@ -875,7 +873,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _addBloodCount() async {
     final value = await showTopModalSheet<String?>(
       context,
-      BoloodCount(),
+      BloodCount(),
       backgroundColor: Theme.of(context).colorScheme.primary,
       borderRadius: const BorderRadius.vertical(
         bottom: Radius.circular(20),
@@ -979,19 +977,19 @@ class InsulinTopModel extends StatelessWidget {
   }
 }
 
-class BoloodCount extends StatelessWidget {
+class BloodCount extends StatelessWidget {
   TextEditingController bloodCountController = TextEditingController();
   TextEditingController bloodPressureController = TextEditingController();
   SharedPrefsHelper pref = SharedPrefsHelper();
 
-  BoloodCount({Key? key}) : super(key: key);
+  BloodCount({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return Container(
-      width: double.infinity,
+      width: width,
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 226, 122, 0),
       ),
@@ -1057,173 +1055,149 @@ class BoloodCount extends StatelessWidget {
                     showModalBottomSheet(
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         context: context,
-                        // isScrollControlled: true,
                         builder: (BuildContext context) {
                           final height = MediaQuery.of(context).size.height;
                           final width = MediaQuery.of(context).size.width;
                           return StatefulBuilder(builder:
                               (BuildContext context, StateSetter setState) {
-                            return AnimatedPadding(
-                              padding: EdgeInsets.only(
-                                  bottom:
-                                      MediaQuery.of(context).viewInsets.bottom),
-                              duration: Duration(milliseconds: 200),
-                              child: Container(
-                                height: height * 0.33,
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 20),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context)
+                            return Container(
+                              height: height * 0.33,
+                              width: width,
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Container(
+                               
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: width * 0.03,
+                                            ),
+                                            Icon(Icons.water_drop_outlined),
+                                            SizedBox(
+                                              width: width * 0.03,
+                                            ),
+                                            SizedBox(
+                                                             width: width / 6,
+                                              child: TextField(
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                cursorColor: Theme.of(context)
                                                     .colorScheme
-                                                    .onSurface,
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  SizedBox(
-                                                    width: width * 0.03,
-                                                  ),
-                                                  Icon(Icons
-                                                      .water_drop_outlined),
-                                                  SizedBox(
-                                                    width: width * 0.03,
-                                                  ),
-                                                  Container(
-                                                    width: width * 0.5,
-                                                    child: TextField(
-                                                      keyboardType:
-                                                          TextInputType.number,
-                                                      cursorColor:
-                                                          Theme.of(context)
-                                                              .colorScheme
-                                                              .onInverseSurface,
-                                                      style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onInverseSurface,
-                                                      ),
-                                                      controller:
-                                                          bloodCountController,
-                                                      decoration: InputDecoration(
-                                                          border:
-                                                              InputBorder.none,
-                                                          hintText:
-                                                              'Enter Blood Count'
-                                                                  .toUpperCase(),
-                                                          hintStyle: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w200)),
-                                                    ),
-                                                  ),
-                                                ],
+                                                    .onInverseSurface,
+                                                style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onInverseSurface,
+                                                ),
+                                                controller: bloodCountController,
+                                                decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                    hintText: 'Enter Blood Count'
+                                                        .toUpperCase(),
+                                                    hintStyle: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w200)),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: height * 0.01,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 15),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurface,
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  SizedBox(
-                                                    width: width * 0.03,
-                                                  ),
-                                                  Icon(Icons
-                                                      .water_drop_outlined),
-                                                  SizedBox(
-                                                    width: width * 0.03,
-                                                  ),
-                                                  Container(
-                                                    width: width * 0.52,
-                                                    child: TextField(
-                                                      keyboardType:
-                                                          TextInputType.number,
-                                                      cursorColor:
-                                                          Theme.of(context)
-                                                              .colorScheme
-                                                              .onInverseSurface,
-                                                      style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onInverseSurface,
-                                                      ),
-                                                      controller:
-                                                          bloodPressureController,
-                                                      decoration: InputDecoration(
-                                                          border:
-                                                              InputBorder.none,
-                                                          hintText:
-                                                              'Enter Blood Pressure'
-                                                                  .toUpperCase(),
-                                                          hintStyle: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w200)),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: height * 0.05,
-                                      ),
-                                      Center(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            pref.putString('BloodSugarCount',
-                                                bloodCountController.text);
-                                            pref.putString('BloodPressure',
-                                                bloodPressureController.text);
-                                            Navigator.pop(context);
-                                          },
-                                          child: Container(
-                                            height: height * 0.05,
-                                            width: width * 0.4,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: Color.fromARGB(
-                                                  255, 5, 53, 93),
-                                            ),
-                                            child: Center(
-                                                child: Text(
-                                              'SUBMIT',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: height * 0.02),
-                                            )),
-                                          ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.01,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Container(
+                               
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: width * 0.03,
+                                            ),
+                                            Icon(Icons.water_drop_outlined),
+                                            SizedBox(
+                                              width: width * 0.03,
+                                            ),
+                                            SizedBox(
+                                                             width: width / 6,
+                                              child: TextField(
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                cursorColor: Theme.of(context)
+                                                    .colorScheme
+                                                    .onInverseSurface,
+                                                style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onInverseSurface,
+                                                ),
+                                                controller: bloodPressureController,
+                                                decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                    hintText: 'Enter Blood Pressure'
+                                                        .toUpperCase(),
+                                                    hintStyle: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w200)),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.05,
+                                    ),
+                                    Center(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          pref.putString('BloodSugarCount',
+                                              bloodCountController.text);
+                                          pref.putString('BloodPressure',
+                                              bloodPressureController.text);
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          height: height * 0.05,
+                                          width: width * 0.4,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color:
+                                                Color.fromARGB(255, 5, 53, 93),
+                                          ),
+                                          child: Center(
+                                              child: Text(
+                                            'SUBMIT',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: height * 0.02),
+                                          )),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             );

@@ -31,7 +31,7 @@ final lastWeight = '$url/api/v1/nutrition/get-last-inserted-user-wt';
 final smartBolusPost = '$url/api/v1/auth/add-smart-bolus-data';
 final insulinData = '$url/api/v1/auth/get-insulin-data';
 final postInsulinData = '$url/api/v1/auth/add-insulin-data';
-
+final getReportData = '$url/api/v1/auth/get-user-report';
 
 
 

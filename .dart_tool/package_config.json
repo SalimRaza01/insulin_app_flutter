@@ -38,6 +38,18 @@
       "languageVersion": "2.18"
     },
     {
+      "name": "barcode",
+      "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/barcode-2.2.8",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "bidi",
+      "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/bidi-2.0.12",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "boolean_selector",
       "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/boolean_selector-2.1.1",
       "packageUri": "lib/",
@@ -266,6 +278,12 @@
       "languageVersion": "2.17"
     },
     {
+      "name": "image",
+      "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/image-4.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.15"
+    },
+    {
       "name": "image_picker",
       "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/image_picker-1.1.2",
       "packageUri": "lib/",
@@ -440,6 +458,18 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "pdf",
+      "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/pdf-3.11.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.19"
+    },
+    {
+      "name": "pdf_widget_wrapper",
+      "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/pdf_widget_wrapper-1.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.18"
+    },
+    {
       "name": "percent_indicator",
       "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/percent_indicator-4.2.3",
       "packageUri": "lib/",
@@ -506,10 +536,22 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "printing",
+      "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/printing-5.13.4",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "provider",
       "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/provider-6.1.2",
       "packageUri": "lib/",
       "languageVersion": "2.12"
+    },
+    {
+      "name": "qr",
+      "rootUri": "file:///Users/ddtech/.pub-cache/hosted/pub.dev/qr-3.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
     },
     {
       "name": "razorpay_flutter",
@@ -746,7 +788,7 @@
       "languageVersion": "3.2"
     }
   ],
-  "generated": "2024-11-07T08:35:13.261096Z",
+  "generated": "2024-11-08T06:37:20.233722Z",
   "generator": "pub",
   "generatorVersion": "3.4.1",
   "flutterRoot": "file:///Users/ddtech/Documents/flutter",

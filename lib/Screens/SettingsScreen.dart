@@ -86,11 +86,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 height: height * 0.65,
                 width: width * 0.9,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(25),
-                      bottomRight: Radius.circular(25),
-                      topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25)),
+                  borderRadius: BorderRadius.all(Radius.circular(20)
+                  ),
                   color: Theme.of(context).colorScheme.tertiaryContainer,
                 ),
                 child: Padding(
@@ -111,16 +108,74 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       SizedBox(
                         height: height * 0.02,
                       ),
-                      Container(
-                        width: width,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color:
-                              Theme.of(context).colorScheme.tertiaryContainer,
-                        ),
-                        child: Column(
-                          children: [
-                            Container(
+                      Column(
+                        children: [
+                          Container(
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.dark_mode,size: height * 0.045,
+                                        color: Color.fromARGB(
+                                            255, 170, 170, 170),
+                                      ),
+                                      SizedBox(
+                                        width: width * 0.02,
+                                      ),
+                                      Text('Dark Mode',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primaryContainer,
+                                              fontWeight:
+                                                  AppColor.lightWeight,
+                                              fontSize: height * 0.018)),
+                                    ],
+                                  ),
+                                  FlutterSwitch(
+                                    inactiveColor: Theme.of(context)
+                                        .colorScheme
+                                        .secondaryContainer,
+                                    // height: 30.0,
+                                    width:  width * 0.1,
+                                    padding: 4.0,
+                                    toggleSize: 25.0,
+                                    borderRadius: 20.0,
+                                    activeColor: Colors.black,
+                                    value: context
+                                        .read<ThemeNotifier>()
+                                        .isDarkMode,
+                      
+                                    onToggle: (value) {
+                                      setState(() {
+                                        prefs.putBool('darkMode', value);
+                                        context
+                                            .read<ThemeNotifier>()
+                                            .isDarkMode = value;
+                                      });
+                                      Provider.of<ThemeNotifier>(context,
+                                              listen: false)
+                                          .themeMode(value);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          NotificationScreen()));
+                            },
+                            child: Container(
                               child: Padding(
                                 padding: const EdgeInsets.all(10),
                                 child: Row(
@@ -130,100 +185,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     Row(
                                       children: [
                                         Icon(
-                                          Icons.dark_mode,
+                                          Icons.notifications,size: height * 0.045,
                                           color: Color.fromARGB(
                                               255, 170, 170, 170),
                                         ),
                                         SizedBox(
                                           width: width * 0.02,
                                         ),
-                                        Text('Dark Mode',
+                                        Text('Notifications',
                                             style: TextStyle(
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .primaryContainer,
                                                 fontWeight:
                                                     AppColor.lightWeight,
-                                                fontSize: height * 0.018)),
+                                                fontSize: height * 0.018))
                                       ],
                                     ),
-                                    FlutterSwitch(
-                                      inactiveColor: Theme.of(context)
-                                          .colorScheme
-                                          .secondaryContainer,
-                                      // height: 30.0,
-                                      width: 55.0,
-                                      padding: 4.0,
-                                      toggleSize: 25.0,
-                                      borderRadius: 20.0,
-                                      activeColor: Colors.black,
-                                      value: context
-                                          .read<ThemeNotifier>()
-                                          .isDarkMode,
-
-                                      onToggle: (value) {
-                                        setState(() {
-                                          prefs.putBool('darkMode', value);
-                                          context
-                                              .read<ThemeNotifier>()
-                                              .isDarkMode = value;
-                                        });
-                                        Provider.of<ThemeNotifier>(context,
-                                                listen: false)
-                                            .themeMode(value);
-                                      },
+                                    Icon(
+                                      Icons.arrow_forward_ios,size: height * 0.045,
+                                      color:
+                                          Color.fromARGB(255, 170, 170, 170),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            NotificationScreen()));
-                              },
-                              child: Container(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.notifications,
-                                            color: Color.fromARGB(
-                                                255, 170, 170, 170),
-                                          ),
-                                          SizedBox(
-                                            width: width * 0.02,
-                                          ),
-                                          Text('Notifications',
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primaryContainer,
-                                                  fontWeight:
-                                                      AppColor.lightWeight,
-                                                  fontSize: height * 0.018))
-                                        ],
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color:
-                                            Color.fromARGB(255, 170, 170, 170),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       SizedBox(
                         height: height * 0.03,
@@ -240,110 +229,102 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       SizedBox(
                         height: height * 0.01,
                       ),
-                      Container(
-                        width: width,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color:
-                              Theme.of(context).colorScheme.tertiaryContainer,
-                        ),
-                        child: Column(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            PrivacyPolicyScreen()));
-                              },
-                              child: Container(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.policy,
-                                            color: Color.fromARGB(
-                                                255, 170, 170, 170),
-                                          ),
-                                          SizedBox(
-                                            width: width * 0.02,
-                                          ),
-                                          Text('Privacy policy',
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primaryContainer,
-                                                  fontWeight:
-                                                      AppColor.lightWeight,
-                                                  fontSize: height * 0.018))
-                                        ],
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color:
-                                            Color.fromARGB(255, 170, 170, 170),
-                                      ),
-                                    ],
-                                  ),
+                      Column(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          PrivacyPolicyScreen()));
+                            },
+                            child: Container(
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.policy,size: height * 0.045,
+                                          color: Color.fromARGB(
+                                              255, 170, 170, 170),
+                                        ),
+                                        SizedBox(
+                                          width: width * 0.02,
+                                        ),
+                                        Text('Privacy policy',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primaryContainer,
+                                                fontWeight:
+                                                    AppColor.lightWeight,
+                                                fontSize: height * 0.018))
+                                      ],
+                                    ),
+                                    Icon(
+                                      Icons.arrow_forward_ios,size: height * 0.045,
+                                      color:
+                                          Color.fromARGB(255, 170, 170, 170),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              height: height * 0.01,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            TermsCondition()));
-                              },
-                              child: Container(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.edit_document,
-                                            color: Color.fromARGB(
-                                                255, 170, 170, 170),
-                                          ),
-                                          SizedBox(
-                                            width: width * 0.02,
-                                          ),
-                                          Text('Terms and conditions',
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primaryContainer,
-                                                  fontWeight:
-                                                      AppColor.lightWeight,
-                                                  fontSize: height * 0.018))
-                                        ],
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color:
-                                            Color.fromARGB(255, 170, 170, 170),
-                                      ),
-                                    ],
-                                  ),
+                          ),
+                          SizedBox(
+                            height: height * 0.01,
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          TermsCondition()));
+                            },
+                            child: Container(
+                              child: Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.edit_document,size: height * 0.045,
+                                          color: Color.fromARGB(
+                                              255, 170, 170, 170),
+                                        ),
+                                        SizedBox(
+                                          width: width * 0.02,
+                                        ),
+                                        Text('Terms and conditions',
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primaryContainer,
+                                                fontWeight:
+                                                    AppColor.lightWeight,
+                                                fontSize: height * 0.018))
+                                      ],
+                                    ),
+                                    Icon(
+                                      Icons.arrow_forward_ios,size: height * 0.045,
+                                      color:
+                                          Color.fromARGB(255, 170, 170, 170),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       InkWell(
                         onTap: () {
@@ -354,67 +335,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           //               chatBotConfig: chatBotConfig,
                           //             )));
                         },
-                        child: Container(
-                          width: width,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color:
-                                Theme.of(context).colorScheme.tertiaryContainer,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.support_agent,
-                                      color: Color.fromARGB(255, 170, 170, 170),
-                                    ),
-                                    SizedBox(
-                                      width: width * 0.02,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Customer Support',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primaryContainer,
-                                                fontWeight:
-                                                    AppColor.lightWeight,
-                                                fontSize: height * 0.018)),
-                                        Text('Let us know',
-                                            style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primaryContainer,
-                                                fontWeight:
-                                                    AppColor.lightWeight,
-                                                fontSize: height * 0.015)),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: Color.fromARGB(255, 170, 170, 170),
-                                ),
-                              ],
-                            ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.support_agent,size: height * 0.045,
+                                    color: Color.fromARGB(255, 170, 170, 170),
+                                  ),
+                                  SizedBox(
+                                    width: width * 0.02,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Customer Support',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primaryContainer,
+                                              fontWeight:
+                                                  AppColor.lightWeight,
+                                              fontSize: height * 0.018)),
+                                      Text('Let us know',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primaryContainer,
+                                              fontWeight:
+                                                  AppColor.lightWeight,
+                                              fontSize: height * 0.015)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios,size: height * 0.045,
+                                color: Color.fromARGB(255, 170, 170, 170),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                       SizedBox(
                         height: height * 0.03,
                       ),
-                      GestureDetector(
+                      InkWell(
                         onTap: () {
                           print('hit');
-
+                    
                           showDialog<void>(
                             barrierColor: Colors.black38,
                             context: context,
@@ -464,31 +437,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             },
                           );
                         },
-                        child: Container(
-                          width: width,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color:
-                                Theme.of(context).colorScheme.tertiaryContainer,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.logout,
-                                  color: Color.fromARGB(255, 170, 170, 170),
-                                ),
-                                SizedBox(
-                                  width: width * 0.02,
-                                ),
-                                Text('Log Out',
-                                    style: TextStyle(
-                                        color: Colors.red,
-                                        fontWeight: AppColor.lightWeight,
-                                        fontSize: height * 0.018)),
-                              ],
-                            ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.logout,size: height * 0.045,
+                                color: Color.fromARGB(255, 170, 170, 170),
+                              ),
+                              SizedBox(
+                                width: width * 0.02,
+                              ),
+                              Text('Log Out',
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: AppColor.lightWeight,
+                                      fontSize: height * 0.018)),
+                            ],
                           ),
                         ),
                       ),
