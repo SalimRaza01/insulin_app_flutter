@@ -189,6 +189,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           builder: (context, value, child) {
             if (value.updatedProfile == true) {
               getProfileData();
+              Future.delayed(Duration(seconds: 2), () {
+            Provider.of<ProfileUpdateNotifier>(context, listen: false)
+                .updateProfile(false);
+          });
             }
             return SingleChildScrollView(
               child: Container(
@@ -700,8 +704,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 70),
                                     child: GestureDetector(
-                                        onTap: () async {
-                                          final result = await Navigator.push(
+                                        onTap: ()  {
+                                        Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
@@ -721,10 +725,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           selectedGender,
                                                           hyperTension2,
                                                           diabetes2)));
-                                          if (result != null &&
-                                              result == 'refresh') {
-                                            getProfileData();
-                                          }
+                                          
+                                   
                                         },
                                         child: Container(
                                           height: height * 0.06,

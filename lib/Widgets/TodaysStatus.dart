@@ -1,9 +1,65 @@
+
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:newproject/utils/Colors.dart';
-class TodaysStatus extends StatelessWidget {
+import 'package:newproject/utils/SharedPrefsHelper.dart';
+import 'package:newproject/utils/config.dart';
+import 'package:intl/intl.dart';
+
+class TodaysStatus extends StatefulWidget {
   const TodaysStatus({Key? key});
+
+  @override
+  State<TodaysStatus> createState() => _TodaysStatusState();
+}
+
+class _TodaysStatusState extends State<TodaysStatus> {
+double insulinDose = 0.0;
+double insulinLevel = 0.0;
+double glucoseMeter = 0.0;
+String updateDate = '';
+
+  Future<void> getCurrentData() async {
+    final dio = Dio();
+    final _sharedPreference = SharedPrefsHelper();
+    final String? userId = await _sharedPreference.getString('userId');
+    print(' user $userId');
+    try {
+      final response = await dio.get(
+        '$getCurrentReading/$userId',
+        queryParameters: {'filter': 'today'},
+      );
+
+      if (response.statusCode == 200) {
+        var data = response.data['data'][0];
+         print('my user insulin 2 $data ${response.data}');
+     
+        setState(() {
+          insulinDose = double.parse(data['insulinCount']);
+          insulinLevel = double.parse(data['insulineLevel']);
+          glucoseMeter = double.parse(data['glucoseCount']);
+        });
+            
+      } else {
+        throw Exception('Failed to load');
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
+      rethrow;
+    }
+  }
+
+
+@override
+  void initState() {
+getCurrentData();
+updateDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -12,9 +68,8 @@ class TodaysStatus extends StatelessWidget {
       // height: height * 0.28,
       width: width,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color:Theme.of(context).colorScheme.primary
-      ),
+          borderRadius: BorderRadius.circular(16),
+          color: Theme.of(context).colorScheme.primary),
       child: Padding(
         padding: EdgeInsets.all(15.0),
         child: Column(
@@ -22,7 +77,7 @@ class TodaysStatus extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'CURRENT READING',
@@ -33,7 +88,7 @@ class TodaysStatus extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'updated at 1:57 PM  10-JUNE-2024',
+                  'Last Updated $updateDate',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.secondaryContainer,
                     fontSize: height * 0.01,
@@ -42,43 +97,46 @@ class TodaysStatus extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: height * 0.03,),
+            SizedBox(
+              height: height * 0.03,
+            ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildCircularIndicator(
-                    context: context,
-                  value: 0.5,
+                  context: context,
+                  value: glucoseMeter / 100,
                   size: height * 0.10,
                   progressColor: Color.fromARGB(255, 76, 76, 76),
-                  valueText: '120',
-                 
+                  valueText: glucoseMeter.toString(),
                   unitText: 'mg/dl',
                 ),
                 _buildCircularIndicator(
                   context: context,
-                  value: 0.5,
-                    size: height * 0.10,
+                  value: insulinDose / 100,
+                  size: height * 0.10,
                   progressColor: Color.fromARGB(255, 59, 177, 86),
-                  valueText: '2.5',
+                  valueText: insulinDose.toString(),
                   unitText: 'units/hr',
                 ),
                 _buildCircularIndicator(
-                    context: context,
-                  value: 0.5,
-                     size: height * 0.10,
+                  context: context,
+                  value: insulinLevel / 100,
+                  size: height * 0.10,
                   progressColor: Color.fromARGB(255, 214, 86, 244),
-                  valueText: '2800',
+                  valueText: insulinLevel.toString(),
                   unitText: 'units',
                 ),
               ],
             ),
-                  SizedBox(height: height * 0.02,),
+            SizedBox(
+              height: height * 0.02,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildLabel('GLUCOMETER' , height, context),
+                _buildLabel('GLUCOMETER', height, context),
                 _buildLabel('INSULIN DOSE', height, context),
                 _buildLabel('INSULIN LEVEL', height, context),
               ],
@@ -88,6 +146,7 @@ class TodaysStatus extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildCircularIndicator({
     required double value,
     required double size,
@@ -95,7 +154,6 @@ class TodaysStatus extends StatelessWidget {
     required String valueText,
     required String unitText,
     required BuildContext context,
-    
   }) {
     return Column(
       children: [
@@ -119,7 +177,7 @@ class TodaysStatus extends StatelessWidget {
                   Text(
                     valueText,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.primaryContainer,
+                        color: Theme.of(context).colorScheme.primaryContainer,
                         fontSize: size * 0.25), // Adjust font size as needed
                   ),
                   Text(
@@ -136,7 +194,8 @@ class TodaysStatus extends StatelessWidget {
       ],
     );
   }
-  Widget _buildLabel(String text, double height , BuildContext context) {
+
+  Widget _buildLabel(String text, double height, BuildContext context) {
     return Text(
       text,
       style: TextStyle(

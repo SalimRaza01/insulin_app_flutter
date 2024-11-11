@@ -32,6 +32,7 @@ final smartBolusPost = '$url/api/v1/auth/add-smart-bolus-data';
 final insulinData = '$url/api/v1/auth/get-insulin-data';
 final postInsulinData = '$url/api/v1/auth/add-insulin-data';
 final getReportData = '$url/api/v1/auth/get-user-report';
+final getCurrentReading = '$url/api/v1/auth/get-user-current-reading';
 
 
 

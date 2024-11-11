@@ -111,23 +111,21 @@ class _HomeScreenState extends State<HomeScreen> {
           Provider.of<Deviceprovider>(context, listen: false);
       if (deviceNotifier.getdevice != null) {
         agvaDevice = deviceNotifier.getdevice;
-        print('my new device $agvaDevice && ${deviceNotifier.getdevice}');
+    
         getServices();
         _startConnectionCheckTimer(agvaDevice!);
       }
     });
 
     _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
-          print('inside scanresult');
       _scanResults = results;
-         print('inside scanresult 2 $results');
       for (ScanResult r in _scanResults) {
-        print('inside scanresult 3 ${r.device.platformName}');
+    
         if (r.device.platformName.contains('AgVa')) {
           agvaDevice = r.device;
 
           if (FlutterBluePlus.isScanningNow) {
-                   print('inside scanresult 4');
+          
             FlutterBluePlus.stopScan();
             Future.delayed(Duration(seconds: 2), () {
               popupDevice(context, agvaDevice!);
@@ -140,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           break;
         } else {
-          print("HERE IT IS _scanResults outside");
+        
         }
       }
     });
@@ -197,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
     print("Scanning is running");
     if (_isScanning == false) {
                print('Scanning');
-      FlutterBluePlus.startScan(timeout: const Duration(seconds: 3));
+      FlutterBluePlus.startScan(timeout: const Duration(seconds: 1));
     }
     if (mounted) {}
     return Future.delayed(Duration(milliseconds: 500));
@@ -206,7 +204,6 @@ class _HomeScreenState extends State<HomeScreen> {
   getServices() async {
     print('get Services from device');
     _services = await agvaDevice?.discoverServices();
-    print('services obtained: $_services');
 
     if (_services != null) {
       onCharacteristicChecked(characteristicUuid, finalString, true);
@@ -221,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
   BluetoothCharacteristic? findCharacteristic(String characteristicUuid) {
     for (BluetoothService service in _services!) {
       for (BluetoothCharacteristic chr in service.characteristics) {
-        print("the chracteristic is ${chr}");
+  
         if (chr.uuid.toString() == characteristicUuid) {
           return chr;
         }
@@ -236,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
       BluetoothCharacteristic? c = findCharacteristic(characteristicUuid);
 
       if (c != null) {
-        print('this is my BLE CHAR $c');
+  
         if (agvaDevice != null) {
           setState(() {
             isDeviceConnected = true;

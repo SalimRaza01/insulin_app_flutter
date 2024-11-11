@@ -11,6 +11,7 @@ import 'package:newproject/utils/BolusDeliveryNotifier.dart';
 import 'package:newproject/utils/GlucoseNotifier.dart';
 import 'package:newproject/utils/NutritionNotifier.dart';
 import 'package:newproject/utils/SmartBolusDelivery.dart';
+import 'package:newproject/utils/UpdateProfileNotifier.dart';
 import 'package:newproject/utils/WeightNotifier.dart';
 import 'package:newproject/utils/config.dart';
 import 'package:provider/provider.dart';
@@ -207,6 +208,9 @@ Future<void> setUpProfileApi(
   bool? diabetes,
   bool? hypertension,
   bool? isProfileCompleted,
+  String? emailController,
+  String? phoneController,
+  BuildContext context
 ) async {
   final _sharedPreference = SharedPrefsHelper();
   final dio = Dio();
@@ -227,7 +231,9 @@ Future<void> setUpProfileApi(
       "weight": weightController,
       "diabetes": diabetes,
       "hypertension": hypertension,
-      "isProfileCompleted": isProfileCompleted
+      "isProfileCompleted": isProfileCompleted,
+      "email": emailController,
+      "phone" : phoneController,
     });
     print(response);
     print('api  hit');
@@ -235,11 +241,13 @@ Future<void> setUpProfileApi(
     if (response.statusCode == 200) {
       _sharedPreference.putBool('isProfileCompleted', isProfileCompleted!);
       _sharedPreference.putString('weight', weightController!);
-
+      Provider.of<ProfileUpdateNotifier>(context,
+                                      listen: false)
+                                  .updateProfile(true);
       print(response);
     } else if (response.statusCode == 400) {
       print('api not hit');
-      _sharedPreference.putBool('DeviceSetup', false);
+  
       print(response);
     }
   } catch (e) {
@@ -294,22 +302,23 @@ Future<void> addBolusUnit(String unit, BuildContext context) async {
 }
 
 Future<void> deviceSetup(bool status, BuildContext context) async {
+
   final _sharedPreference = SharedPrefsHelper();
   final dio = Dio();
 
   final String? userId = await _sharedPreference.getString('userId');
-  try {
-    final response = await dio.post('$postSetupDevice/$userId', data: {
+      
+
+    final response = await dio.put('$postSetupDevice/$userId', data: {
       'isDeviceSetup': status,
     });
     if (response.statusCode == 200) {
-      print(response);
+   
+      print('Device Setup True $status');
     } else {
-      print('error');
+      print('Device Setup Backend $response');
     }
-  } catch (e) {
-    print(e);
-  }
+ 
 }
 
 Future<void> addGlucoseUnit(String unit, BuildContext context) async {

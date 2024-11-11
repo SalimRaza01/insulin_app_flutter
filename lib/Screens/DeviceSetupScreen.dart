@@ -213,7 +213,6 @@ setState(() {
   }
 
   List<Widget> _buildScanResultTiles(BuildContext context) {
-      print('available devices $_scanResults');
     return _scanResults
         .map((r) => ScanResultTile(
               result: r,

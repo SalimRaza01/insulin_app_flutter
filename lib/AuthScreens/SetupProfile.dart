@@ -1306,6 +1306,7 @@ class _SetupProfileState extends State<SetupProfile> {
                                   diabeties,
                                   hypertension,
                                   true,
+                                  "","", context
                                 );
 
                                 Navigator.push(

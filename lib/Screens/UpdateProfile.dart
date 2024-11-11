@@ -31,19 +31,20 @@ class UpdateProfile extends StatefulWidget {
   bool diabetes2;
 
   UpdateProfile(
-      this.fname,
-      this.lname,
-      this.dob,
-      this.age,
-      this.phone,
-      this.email,
-      this.state,
-      this.city,
-      this.height,
-      this.weight,
-      this.gender,
-      this.hyperTension2,
-      this.diabetes2);
+    this.fname,
+    this.lname,
+    this.dob,
+    this.age,
+    this.phone,
+    this.email,
+    this.state,
+    this.city,
+    this.height,
+    this.weight,
+    this.gender,
+    this.hyperTension2,
+    this.diabetes2,
+  );
 
   @override
   State<UpdateProfile> createState() => _UpdateProfileState();
@@ -72,6 +73,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
   TextEditingController dobController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController stateController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
 
   String selectedGender = '';
 
@@ -95,16 +98,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
 
   @override
   void dispose() {
-    heightController.dispose();
-    weightController.dispose();
-    cityController.dispose();
-    ageController.dispose();
-    firstnameController.dispose();
-    lastnameController.dispose();
-    dobController.dispose();
-    cityController.dispose();
-    stateController.dispose();
-
     super.dispose();
   }
 
@@ -423,381 +416,383 @@ class _UpdateProfileState extends State<UpdateProfile> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSecondary,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 0, left: 18),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: height * 0.07,
-                  ),
-                  Text(
-                    "UPDATE YOUR PROFILE",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w200,
-                      fontSize: height * 0.03,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: height * 0.85,
+    return Scaffold(body: Consumer<ProfileUpdateNotifier>(
+      builder: (context, value, child) {
+        if (value.updatedProfile == true) {
+          
+          Navigator.pop(context);
+        }
+
+        return Stack(
+          children: [
+            Container(
+              height: double.infinity,
               width: double.infinity,
               decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30))),
+                color: Theme.of(context).colorScheme.onSecondary,
+              ),
               child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                    child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.only(top: 0, left: 18),
+                child: Column(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: TextField(
-                        controller: firstnameController,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          fontSize: height * 0.018,
-                        ),
-                        decoration: InputDecoration(
-                          icon: Icon(
-                            Icons.person,
-                            color:
-                                Theme.of(context).colorScheme.primaryContainer,
-                          ),
-                          border: InputBorder.none,
-                          hintText: widget.fname,
-                          hintStyle: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                              fontSize: height * 0.018,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: Color.fromARGB(155, 174, 174, 174),
-                    ),
                     SizedBox(
-                      height: height * 0.01,
+                      height: height * 0.07,
                     ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: TextField(
-                        controller: lastnameController,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          fontSize: height * 0.018,
-                        ),
-                        decoration: InputDecoration(
-                          icon: Icon(
-                            Icons.person,
-                            color:
-                                Theme.of(context).colorScheme.primaryContainer,
-                          ),
-                          border: InputBorder.none,
-                          hintText: widget.lname,
-                          hintStyle: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                              fontSize: height * 0.018,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: Color.fromARGB(155, 174, 174, 174),
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: TextField(
-                        readOnly: true,
-                        controller: dobController,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          fontSize: height * 0.018,
-                        ),
-                        decoration: InputDecoration(
-                          icon: Icon(
-                            Icons.calendar_month,
-                            color:
-                                Theme.of(context).colorScheme.primaryContainer,
-                          ),
-                          border: InputBorder.none,
-                          hintText: widget.dob,
-                          hintStyle: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                              fontSize: height * 0.018,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        onTap: () {
-                          showModalBottomSheet(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            context: context,
-                            builder: (context) {
-                              return SizedBox(
-                                  height: height * 0.42,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: Column(
-                                    children: [
-                                      SizedBox(
-                                        height: height * 0.3,
-                                        child: CupertinoDatePicker(
-                                          initialDateTime: DateTime.now(),
-                                          mode: CupertinoDatePickerMode.date,
-                                          use24hFormat: true,
-                                          minimumDate: DateTime(1900),
-                                          maximumDate: DateTime.now(),
-                                          onDateTimeChanged: (DateTime newDate) {
-                                            selectedData = newDate;
-                                          },
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(10),
-                                        child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                            children: [
-                                              InkWell(
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Container(
-                                                    width: MediaQuery.of(context)
-                                                            .size
-                                                            .width /
-                                                        2.5,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Color.fromRGBO(
-                                                          255, 87, 87, 1),
-                                                    ),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 30,
-                                                          vertical: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          'CANCEL',
-                                                          style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: 15),
-                                                        ),
-                                                      ),
-                                                    )),
-                                              ),
-                                              InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    dobController.text =
-                                                        DateFormat('dd/MM/yyyy')
-                                                            .format(selectedData);
-                                
-                                                    int age =
-                                                        DateTime.now().year -
-                                                            selectedData.year;
-                                
-                                                    if (DateTime.now().month <
-                                                            selectedData.month ||
-                                                        (DateTime.now().month ==
-                                                                selectedData
-                                                                    .month &&
-                                                            DateTime.now().day <
-                                                                selectedData
-                                                                    .day)) {
-                                                      age--;
-                                                    }
-                                
-                                                    ageController.text =
-                                                        age.toString();
-                                                  });
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Container(
-                                                    width: MediaQuery.of(context)
-                                                            .size
-                                                            .width /
-                                                        2.5,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Color.fromRGBO(
-                                                          112, 217, 136, 1),
-                                                    ),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 30,
-                                                          vertical: 10),
-                                                      child: Center(
-                                                        child: Text(
-                                                          'SELECT',
-                                                          style: TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: 15),
-                                                        ),
-                                                      ),
-                                                    )),
-                                              ),
-                                            ]),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: Color.fromARGB(155, 174, 174, 174),
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    TextField(
-                      selectionControls: CupertinoTextSelectionControls(),
-                      controller: stateController,
+                    Text(
+                      "UPDATE YOUR PROFILE",
+                      textAlign: TextAlign.start,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        fontSize: height * 0.018,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w200,
+                        fontSize: height * 0.03,
                       ),
-                      decoration: InputDecoration(
-                        icon: Icon(
-                          Icons.location_on,
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                        ),
-                        border: InputBorder.none,
-                        hintText: widget.state,
-                        hintStyle: TextStyle(
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: height * 0.85,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30))),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: SingleChildScrollView(
+                      child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: TextField(
+                          controller: firstnameController,
+                          style: TextStyle(
                             color:
                                 Theme.of(context).colorScheme.primaryContainer,
                             fontSize: height * 0.018,
-                            fontWeight: FontWeight.w400),
+                          ),
+                          decoration: InputDecoration(
+                            icon: Icon(
+                              Icons.person,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                            ),
+                            border: InputBorder.none,
+                            hintText: widget.fname,
+                            hintStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                                fontSize: height * 0.018,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          showStatelist = true;
-                          if (value.isEmpty) {
-                            showStatelist = false;
-                          }
-                        });
-                      },
-                    ),
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 500),
-                      curve: Curves.fastOutSlowIn,
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.outline,
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                      height: showStatelist ? 50 : 0,
-                      child: FutureBuilder<List<Statemodel>>(
-                        future: Future.delayed(Duration(milliseconds: 300), () {
-                          return getStateList();
-                        }),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: SizedBox());
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return Center(child: Text('No data available'));
-                          } else {
-                            final items = snapshot.data!;
-                            final filteredItems = items
-                                .where((item) => item.name!
-                                    .toLowerCase()
-                                    .contains(
-                                        stateController.text.toLowerCase()))
-                                .toList();
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.01,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: TextField(
+                          controller: lastnameController,
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            fontSize: height * 0.018,
+                          ),
+                          decoration: InputDecoration(
+                            icon: Icon(
+                              Icons.person,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                            ),
+                            border: InputBorder.none,
+                            hintText: widget.lname,
+                            hintStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                                fontSize: height * 0.018,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: TextField(
+                          controller: emailController,
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            fontSize: height * 0.018,
+                          ),
+                          decoration: InputDecoration(
+                            icon: Icon(
+                              Icons.email,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                            ),
+                            border: InputBorder.none,
+                            hintText: widget.email.isNotEmpty
+                                ? widget.email
+                                : " Enter your email",
+                            hintStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                                fontSize: height * 0.018,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: TextField(
+                          controller: phoneController,
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            fontSize: height * 0.018,
+                          ),
+                          decoration: InputDecoration(
+                            icon: Icon(
+                              Icons.phone,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                            ),
+                            border: InputBorder.none,
+                            hintText: widget.phone.isNotEmpty
+                                ? widget.phone
+                                : 'Enter Phone Number',
+                            hintStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                                fontSize: height * 0.018,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: TextField(
+                          readOnly: true,
+                          controller: dobController,
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            fontSize: height * 0.018,
+                          ),
+                          decoration: InputDecoration(
+                            icon: Icon(
+                              Icons.calendar_month,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                            ),
+                            border: InputBorder.none,
+                            hintText: widget.dob,
+                            hintStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                                fontSize: height * 0.018,
+                                fontWeight: FontWeight.w400),
+                          ),
+                          onTap: () {
+                            showModalBottomSheet(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              context: context,
+                              builder: (context) {
+                                return SizedBox(
+                                  height: height * 0.42,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          height: height * 0.3,
+                                          child: CupertinoDatePicker(
+                                            initialDateTime: DateTime.now(),
+                                            mode: CupertinoDatePickerMode.date,
+                                            use24hFormat: true,
+                                            minimumDate: DateTime(1900),
+                                            maximumDate: DateTime.now(),
+                                            onDateTimeChanged:
+                                                (DateTime newDate) {
+                                              selectedData = newDate;
+                                            },
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Container(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width /
+                                                              2.5,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        color: Color.fromRGBO(
+                                                            255, 87, 87, 1),
+                                                      ),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 30,
+                                                                vertical: 10),
+                                                        child: Center(
+                                                          child: Text(
+                                                            'CANCEL',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 15),
+                                                          ),
+                                                        ),
+                                                      )),
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      dobController
+                                                          .text = DateFormat(
+                                                              'dd/MM/yyyy')
+                                                          .format(selectedData);
 
-                            return ListView.builder(
-                              padding: EdgeInsets.all(0),
-                              itemCount: filteredItems.length,
-                              itemBuilder: (context, index) {
-                                final stateItem = filteredItems[index];
-                                return ListTile(
-                                  title: Text(
-                                    stateItem.name!,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onInverseSurface,
+                                                      int age =
+                                                          DateTime.now().year -
+                                                              selectedData.year;
+
+                                                      if (DateTime.now().month <
+                                                              selectedData
+                                                                  .month ||
+                                                          (DateTime.now()
+                                                                      .month ==
+                                                                  selectedData
+                                                                      .month &&
+                                                              DateTime.now()
+                                                                      .day <
+                                                                  selectedData
+                                                                      .day)) {
+                                                        age--;
+                                                      }
+
+                                                      ageController.text =
+                                                          age.toString();
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Container(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width /
+                                                              2.5,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        color: Color.fromRGBO(
+                                                            112, 217, 136, 1),
+                                                      ),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 30,
+                                                                vertical: 10),
+                                                        child: Center(
+                                                          child: Text(
+                                                            'SELECT',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 15),
+                                                          ),
+                                                        ),
+                                                      )),
+                                                ),
+                                              ]),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  onTap: () {
-                                    setState(() {
-                                      stateController.text = stateItem.name!;
-                                      showStatelist = false;
-                                    });
-                                  },
                                 );
                               },
                             );
-                          }
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: Color.fromARGB(155, 174, 174, 174),
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: TextField(
-                        controller: cityController,
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                      TextField(
+                        selectionControls: CupertinoTextSelectionControls(),
+                        controller: stateController,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primaryContainer,
                           fontSize: height * 0.018,
                         ),
                         decoration: InputDecoration(
                           icon: Icon(
-                            Icons.location_city,
+                            Icons.location_on,
                             color:
                                 Theme.of(context).colorScheme.primaryContainer,
                           ),
                           border: InputBorder.none,
-                          hintText: widget.city,
+                          hintText: widget.state,
                           hintStyle: TextStyle(
                               color: Theme.of(context)
                                   .colorScheme
@@ -807,93 +802,236 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         ),
                         onChanged: (value) {
                           setState(() {
-                            showCityList = true;
+                            showStatelist = true;
                             if (value.isEmpty) {
-                              showCityList = false;
+                              showStatelist = false;
                             }
                           });
                         },
                       ),
-                    ),
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 500),
-                      curve: Curves.fastOutSlowIn,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.outline,
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                      ),
-                      height: showCityList ? 50 : 0,
-                      child: FutureBuilder<List<Citymodel>>(
-                        future: stateController.text.isEmpty
-                            ? getCityList(widget.state)
-                            : getCityList(stateController.text),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(child: SizedBox());
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return Center(child: Text('No data available'));
-                          } else {
-                            final items = snapshot.data!;
-                            final filteredItems = items
-                                .where((item) => item.name!
-                                    .toLowerCase()
-                                    .contains(
-                                        cityController.text.toLowerCase()))
-                                .toList();
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.fastOutSlowIn,
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.outline,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        height: showStatelist ? 50 : 0,
+                        child: FutureBuilder<List<Statemodel>>(
+                          future:
+                              Future.delayed(Duration(milliseconds: 300), () {
+                            return getStateList();
+                          }),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: SizedBox());
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Center(child: Text('No data available'));
+                            } else {
+                              final items = snapshot.data!;
+                              final filteredItems = items
+                                  .where((item) => item.name!
+                                      .toLowerCase()
+                                      .contains(
+                                          stateController.text.toLowerCase()))
+                                  .toList();
 
-                            return ListView.builder(
-                              padding: EdgeInsets.all(0),
-                              itemCount: filteredItems.length,
-                              itemBuilder: (context, index) {
-                                final cityItems = filteredItems[index];
-                                return ListTile(
-                                  title: Text(
-                                    cityItems.name!,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onInverseSurface,
+                              return ListView.builder(
+                                padding: EdgeInsets.all(0),
+                                itemCount: filteredItems.length,
+                                itemBuilder: (context, index) {
+                                  final stateItem = filteredItems[index];
+                                  return ListTile(
+                                    title: Text(
+                                      stateItem.name!,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onInverseSurface,
+                                      ),
                                     ),
-                                  ),
-                                  onTap: () {
-                                    setState(() {
-                                      cityController.text = cityItems.name!;
-                                      showCityList = false;
-                                    });
-                                  },
-                                );
-                              },
-                            );
-                          }
-                        },
+                                    onTap: () {
+                                      setState(() {
+                                        stateController.text = stateItem.name!;
+                                        showStatelist = false;
+                                      });
+                                    },
+                                  );
+                                },
+                              );
+                            }
+                          },
+                        ),
                       ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: Color.fromARGB(155, 174, 174, 174),
-                    ),
-                    SizedBox(
-                      height: height * 0.02,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        _selectGenderType();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: TextField(
+                          controller: cityController,
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            fontSize: height * 0.018,
+                          ),
+                          decoration: InputDecoration(
+                            icon: Icon(
+                              Icons.location_city,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                            ),
+                            border: InputBorder.none,
+                            hintText: widget.city,
+                            hintStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                                fontSize: height * 0.018,
+                                fontWeight: FontWeight.w400),
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              showCityList = true;
+                              if (value.isEmpty) {
+                                showCityList = false;
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.fastOutSlowIn,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.outline,
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                        height: showCityList ? 50 : 0,
+                        child: FutureBuilder<List<Citymodel>>(
+                          future: stateController.text.isEmpty
+                              ? getCityList(widget.state)
+                              : getCityList(stateController.text),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: SizedBox());
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Center(child: Text('No data available'));
+                            } else {
+                              final items = snapshot.data!;
+                              final filteredItems = items
+                                  .where((item) => item.name!
+                                      .toLowerCase()
+                                      .contains(
+                                          cityController.text.toLowerCase()))
+                                  .toList();
+
+                              return ListView.builder(
+                                padding: EdgeInsets.all(0),
+                                itemCount: filteredItems.length,
+                                itemBuilder: (context, index) {
+                                  final cityItems = filteredItems[index];
+                                  return ListTile(
+                                    title: Text(
+                                      cityItems.name!,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onInverseSurface,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      setState(() {
+                                        cityController.text = cityItems.name!;
+                                        showCityList = false;
+                                      });
+                                    },
+                                  );
+                                },
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.02,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          _selectGenderType();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    selectedGender == 'Male'
+                                        ? Icons.male
+                                        : Icons.female,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                  ),
+                                  SizedBox(
+                                    width: width * 0.04,
+                                  ),
+                                  Text(
+                                    selectedGender,
+                                    style: TextStyle(
+                                        fontSize: height * 0.018,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              Icon(
+                                Icons.arrow_drop_down,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.022,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(
                               children: [
                                 Icon(
-                                  selectedGender == 'Male'
-                                      ? Icons.male
-                                      : Icons.female,
+                                  Icons.man_2_outlined,
                                   color: Theme.of(context)
                                       .colorScheme
                                       .primaryContainer,
@@ -901,382 +1039,340 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                 SizedBox(
                                   width: width * 0.04,
                                 ),
+                                if (ageController.text.isEmpty)
+                                  Text(
+                                    widget.age.toString(),
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer,
+                                        fontSize: height * 0.018,
+                                        fontWeight: FontWeight.w400),
+                                  ),
                                 Text(
-                                  selectedGender,
+                                  ageController.text,
                                   style: TextStyle(
-                                      fontSize: height * 0.018,
                                       color: Theme.of(context)
                                           .colorScheme
                                           .primaryContainer,
+                                      fontSize: height * 0.018,
                                       fontWeight: FontWeight.w400),
                                 ),
                               ],
                             ),
-                            Icon(
-                              Icons.arrow_drop_down,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'years',
+                                style: TextStyle(color: Colors.black54),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.033,
+                      ),
+                      InkWell(
+                        onTap: _selectHeight,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.height,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                  ),
+                                  SizedBox(
+                                    width: width * 0.04,
+                                  ),
+                                  if (heightController.text.isEmpty)
+                                    Text(
+                                      widget.height.toString(),
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primaryContainer,
+                                          fontSize: height * 0.018,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  Text(
+                                    heightController.text,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer,
+                                        fontSize: height * 0.018,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'cms',
+                                  style: TextStyle(color: Colors.black54),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.033,
+                      ),
+                      InkWell(
+                        onTap: _selectWeight,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.monitor_weight,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer,
+                                  ),
+                                  SizedBox(
+                                    width: width * 0.04,
+                                  ),
+                                  if (weightController.text.isEmpty)
+                                    Text(
+                                      widget.weight.toString(),
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primaryContainer,
+                                          fontSize: height * 0.018,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  Text(
+                                    weightController.text,
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer,
+                                        fontSize: height * 0.018,
+                                        fontWeight: FontWeight.w400),
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  'kg',
+                                  style: TextStyle(color: Colors.black54),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: Color.fromARGB(155, 174, 174, 174),
+                      ),
+                      SizedBox(
+                        height: height * 0.015,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              child: Row(
+                                children: [
+                                  //SizedBox
+                                  Text(
+                                    'Diabetes',
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer,
+                                        fontSize: height * 0.018,
+                                        fontWeight: FontWeight.w400),
+                                  ), //Text
+                                  //SizedBox
+
+                                  Checkbox(
+                                    checkColor: Colors.white,
+                                    activeColor: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
+                                    value: widget.diabetes2,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        widget.diabetes2 = value!;
+                                        showError = false;
+                                      });
+                                    },
+                                  ),
+                                ], //<Widget>[]
+                              ),
+                            ),
+                            Container(
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Hypertension',
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer,
+                                        fontSize: height * 0.018,
+                                        fontWeight: FontWeight.w400),
+                                  ), //Text
+                                  //SizedBox
+
+                                  Checkbox(
+                                    checkColor: Colors.white,
+                                    activeColor: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
+                                    value: widget.hyperTension2,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        widget.hyperTension2 = value!;
+                                        showError = false;
+                                      });
+                                    },
+                                  )
+                                ],
+                              ),
                             )
                           ],
                         ),
                       ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: Color.fromARGB(155, 174, 174, 174),
-                    ),
-                    SizedBox(
-                      height: height * 0.022,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 2),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Visibility(
+                          visible: showError,
+                          child: Text(
+                            error,
+                            style: TextStyle(color: Colors.red),
+                          )),
+                      SizedBox(
+                        height: height * 0.03,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.man_2_outlined,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
-                              ),
-                              SizedBox(
-                                width: width * 0.04,
-                              ),
-                              if (ageController.text.isEmpty)
-                                Text(
-                                  widget.age.toString(),
+                          InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width / 3,
+                              height: height * 0.05,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary),
+                              child: Center(
+                                child: Text(
+                                  "Back",
                                   style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                      fontSize: height * 0.018,
-                                      fontWeight: FontWeight.w400),
+                                      color: Colors.white,
+                                      fontSize: height * 0.02),
                                 ),
-                              Text(
-                                ageController.text,
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primaryContainer,
-                                    fontSize: height * 0.018,
-                                    fontWeight: FontWeight.w400),
                               ),
-                            ],
+                            ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'years',
-                              style: TextStyle(color: Colors.black54),
+                          InkWell(
+                            onTap: () async {
+                              if (widget.diabetes2 == true ||
+                                  widget.hyperTension2 == true) {
+                                await setUpProfileApi(
+                                    firstnameController.text.isEmpty
+                                        ? widget.fname
+                                        : firstnameController.text,
+                                    lastnameController.text.isEmpty
+                                        ? widget.lname
+                                        : lastnameController.text,
+                                    dobController.text.isEmpty
+                                        ? widget.dob
+                                        : dobController.text,
+                                    ageController.text.isEmpty
+                                        ? widget.age
+                                        : ageController.text,
+                                    cityController.text.isEmpty
+                                        ? widget.city
+                                        : cityController.text,
+                                    stateController.text.isEmpty
+                                        ? widget.state
+                                        : stateController.text,
+                                    selectedGender == widget.gender
+                                        ? widget.gender
+                                        : selectedGender,
+                                    heightController.text.isEmpty
+                                        ? widget.height
+                                        : heightController.text,
+                                    weightController.text.isEmpty
+                                        ? widget.weight
+                                        : weightController.text,
+                                    widget.diabetes2,
+                                    widget.hyperTension2,
+                                    isProfileCompleted,
+                                    emailController.text.isEmpty
+                                        ? widget.email
+                                        : emailController.text,
+                                    phoneController.text.isEmpty
+                                        ? widget.phone
+                                        : phoneController.text,
+                                    context);
+                              } else {
+                                setState(() {
+                                  showError = true;
+                                });
+                              }
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width / 3,
+                              height: height * 0.05,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary),
+                              child: Center(
+                                child: Text(
+                                  "SAVE",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: height * 0.02),
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: Color.fromARGB(155, 174, 174, 174),
-                    ),
-                    SizedBox(
-                      height: height * 0.033,
-                    ),
-                    InkWell(
-                      onTap: _selectHeight,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.height,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer,
-                                ),
-                                SizedBox(
-                                  width: width * 0.04,
-                                ),
-                                if (heightController.text.isEmpty)
-                                  Text(
-                                    widget.height.toString(),
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primaryContainer,
-                                        fontSize: height * 0.018,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                Text(
-                                  heightController.text,
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                      fontSize: height * 0.018,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'cms',
-                                style: TextStyle(color: Colors.black54),
-                              ),
-                            ),
-                          ],
-                        ),
+                      SizedBox(
+                        height: height * 0.04,
                       ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: Color.fromARGB(155, 174, 174, 174),
-                    ),
-                    SizedBox(
-                      height: height * 0.033,
-                    ),
-                    InkWell(
-                      onTap: _selectWeight,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.monitor_weight,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primaryContainer,
-                                ),
-                                SizedBox(
-                                  width: width * 0.04,
-                                ),
-                                if (weightController.text.isEmpty)
-                                  Text(
-                                    widget.weight.toString(),
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primaryContainer,
-                                        fontSize: height * 0.018,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                Text(
-                                  weightController.text,
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                      fontSize: height * 0.018,
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'kg',
-                                style: TextStyle(color: Colors.black54),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Divider(
-                      thickness: 1,
-                      color: Color.fromARGB(155, 174, 174, 174),
-                    ),
-                    SizedBox(
-                      height: height * 0.015,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            child: Row(
-                              children: [
-                                //SizedBox
-                                Text(
-                                  'Diabetes',
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                      fontSize: height * 0.018,
-                                      fontWeight: FontWeight.w400),
-                                ), //Text
-                                //SizedBox
-
-                                Checkbox(
-                                  checkColor: Colors.white,
-                                  activeColor:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  value: widget.diabetes2,
-                                  onChanged: (bool? value) {
-                                    setState(() {
-                                      widget.diabetes2 = value!;
-                                      showError = false;
-                                    });
-                                  },
-                                ),
-                              ], //<Widget>[]
-                            ),
-                          ),
-                          Container(
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Hypertension',
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primaryContainer,
-                                      fontSize: height * 0.018,
-                                      fontWeight: FontWeight.w400),
-                                ), //Text
-                                //SizedBox
-
-                                Checkbox(
-                                  checkColor: Colors.white,
-                                  activeColor:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  value: widget.hyperTension2,
-                                  onChanged: (bool? value) {
-                                    setState(() {
-                                      widget.hyperTension2 = value!;
-                                      showError = false;
-                                    });
-                                  },
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    Visibility(
-                        visible: showError,
-                        child: Text(
-                          error,
-                          style: TextStyle(color: Colors.red),
-                        )),
-                    SizedBox(
-                      height: height * 0.03,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width / 3,
-                            height: height * 0.05,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary),
-                            child: Center(
-                              child: Text(
-                                "Back",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: height * 0.02),
-                              ),
-                            ),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () async {
-                            if (widget.diabetes2 == true ||
-                                widget.hyperTension2 == true) {
-                              await setUpProfileApi(
-                                  firstnameController.text.isEmpty
-                                      ? widget.fname
-                                      : firstnameController.text,
-                                  lastnameController.text.isEmpty
-                                      ? widget.lname
-                                      : lastnameController.text,
-                                  dobController.text.isEmpty
-                                      ? widget.dob
-                                      : dobController.text,
-                                  ageController.text.isEmpty
-                                      ? widget.age
-                                      : ageController.text,
-                                  cityController.text.isEmpty
-                                      ? widget.city
-                                      : cityController.text,
-                                  stateController.text.isEmpty
-                                      ? widget.state
-                                      : stateController.text,
-                                  selectedGender == widget.gender
-                                      ? widget.gender
-                                      : selectedGender,
-                                  heightController.text.isEmpty
-                                      ? widget.height
-                                      : heightController.text,
-                                  weightController.text.isEmpty
-                                      ? widget.weight
-                                      : weightController.text,
-                                  widget.diabetes2,
-                                  widget.hyperTension2,
-                                  isProfileCompleted);
-                             
-
-                              Provider.of<ProfileUpdateNotifier>(context,
-                                      listen: false)
-                                  .updateProfile(true);
-                              Future.delayed(Duration(seconds: 2), () {
-                                Provider.of<ProfileUpdateNotifier>(context,
-                                        listen: false)
-                                    .updateProfile(false);
-                              });
-                            } else {
-                              setState(() {
-                                showError = true;
-                              });
-                            }
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width / 3,
-                            height: height * 0.05,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary),
-                            child: Center(
-                              child: Text(
-                                "SAVE",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: height * 0.02),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: height * 0.04,
-                    ),
-                  ],
-                )),
+                    ],
+                  )),
+                ),
               ),
-            ),
-          )
-        ],
-      ),
-    );
+            )
+          ],
+        );
+      },
+    ));
   }
 }
