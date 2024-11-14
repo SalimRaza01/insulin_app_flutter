@@ -9,9 +9,8 @@ import 'package:newproject/Screens/ReportScreen.dart';
 import 'package:newproject/Screens/SettingsScreen.dart';
 import 'package:newproject/Screens/HomeScreen.dart';
 import 'package:newproject/Screens/SmartbolusScreen.dart';
-import 'package:newproject/utils/DeviceConnectProvider.dart';
+import 'package:newproject/utils/BLE_Provider.dart';
 import 'package:newproject/utils/SharedPrefsHelper.dart';
-import 'package:provider/provider.dart';
 import 'package:top_modal_sheet/top_modal_sheet.dart';
 
 class AppDrawerNavigation extends StatefulWidget {
@@ -26,6 +25,7 @@ class AppDrawerNavigation extends StatefulWidget {
 }
 
 class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
+    final BleManager _bleManager = BleManager();
   final pref = SharedPrefsHelper();
   File? _image;
   String _topModalData = "";
@@ -61,9 +61,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-    return Consumer<Deviceconnection>(
-      builder: (context, value, child) {
-        return Drawer(
+    return Drawer(
           width: width / 1.8,
           child: Container(
             color: Theme.of(context).colorScheme.secondary,
@@ -199,7 +197,7 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
                               fontSize: height * 0.015,
                             )),
                         onTap: () {
-                          if (value.deviceConnectionStatus == true) {
+                          if (_bleManager.isDeviceConnected.value == true) {
                             Navigator.pop(context);
                             Navigator.pushAndRemoveUntil(
                                 context,
@@ -363,8 +361,6 @@ class _AppDrawerNavigationState extends State<AppDrawerNavigation> {
             ),
           ),
         );
-      },
-    );
   }
 }
 

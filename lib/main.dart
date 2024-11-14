@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:newproject/AuthScreens/SetupProfile.dart';
 import 'package:newproject/AuthScreens/SplashScreen.dart';
 import 'package:newproject/AuthScreens/auth_Provider.dart';
+import 'package:newproject/utils/BLE_Provider.dart';
 import 'package:newproject/utils/SharedPrefsHelper.dart';
 import 'package:newproject/Screens/AuthModule.dart';
 import 'package:newproject/Screens/BasalWizard.dart';
@@ -19,28 +21,28 @@ import 'package:newproject/Screens/SmartbolusScreen.dart';
 import 'package:newproject/Screens/WeightScreen.dart';
 import 'package:newproject/utils/BasalDeliveryNotifier.dart';
 import 'package:newproject/utils/BolusDeliveryNotifier.dart';
-import 'package:newproject/utils/CharacteristicProvider.dart';
-import 'package:newproject/utils/DeviceConnectProvider.dart';
-import 'package:newproject/utils/DeviceProvider.dart';
 import 'package:newproject/utils/GlucoseNotifier.dart';
 import 'package:newproject/utils/NutritionNotifier.dart';
-import 'package:newproject/utils/ReadNotifier.dart';
 import 'package:newproject/utils/SmartBolusDelivery.dart';
 import 'package:newproject/utils/Theme.dart';
 import 'package:newproject/utils/ThemeProvider.dart';
 import 'package:newproject/utils/UpdateProfileNotifier.dart';
 import 'package:newproject/utils/WeightNotifier.dart';
+import 'package:newproject/utils/flutter_background_service.dart';
 import 'package:provider/provider.dart';
+
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPrefsHelper().init();
   FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
+  await initializeService();
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ReadNotifier()),
-        ChangeNotifierProvider(create: (_) => Deviceprovider()),
+
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => OtpProvider()),
         ChangeNotifierProvider(create: (_) => ResendOtp()),
@@ -51,9 +53,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NutritionChartNotifier()),
         ChangeNotifierProvider(create: (_) => ThemeNotifier()),
         ChangeNotifierProvider(create: (_) => ProfileUpdateNotifier()),
-        ChangeNotifierProvider(create: (_) => CharacteristicProvider()),
-        ChangeNotifierProvider(create: (_) => Deviceconnection()),
-               ChangeNotifierProvider(create: (_) => SmartBolusDelivery()),
+        ChangeNotifierProvider(create: (_) => SmartBolusDelivery()),
+        ChangeNotifierProvider(create: (_) => BleManager()),
       ],
       child: MyApp(),
     ),
@@ -76,14 +77,13 @@ class MyApp extends StatelessWidget {
         }
 
         return MaterialApp(
-          
           theme: lightMode,
           darkTheme: darkMode,
           themeMode: value.isDarkMode && _sharedPref.getBool('darkMode') == true
               ? ThemeMode.dark
               : ThemeMode.light,
           debugShowCheckedModeBanner: false,
-          initialRoute: "/SplashScreen",
+          initialRoute: "/HomeScreen",
           routes: {
             "/SplashScreen": (context) => Splashscreen(),
             "/HomeScreen": (context) => HomeScreen(),

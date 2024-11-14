@@ -43,6 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.putBool("isLoggedIn", false);
     prefs.putBool('isProfileCompleted', false);
     prefs.putBool('isDeviceSetup', false);
+    prefs.putBool('darkMode', false);
   }
 
   @override

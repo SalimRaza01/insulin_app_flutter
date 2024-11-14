@@ -5,13 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:newproject/Middleware/API.dart';
 import 'package:newproject/Widgets/BasalGraph.dart';
 import 'package:newproject/Widgets/Buttons.dart';
-import 'package:newproject/utils/CharacteristicProvider.dart';
-import 'package:newproject/utils/DeviceProvider.dart';
+import 'package:newproject/utils/BLE_Provider.dart';
 import 'package:newproject/utils/Drawer.dart';
 import 'package:newproject/utils/SharedPrefsHelper.dart';
 import 'package:newproject/utils/config.dart';
 import 'package:newproject/utils/popover.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class BasalHistory {
@@ -43,6 +41,9 @@ class BasalWizard extends StatefulWidget {
 }
 
 class _BasalWizardState extends State<BasalWizard> {
+    final BleManager _bleManager = BleManager();
+  String char = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
+  String cmd = 'cm+sync';
   String basalStatus = '';
   String dosage = '';
   bool deliveryStarted = false;
@@ -67,7 +68,6 @@ class _BasalWizardState extends State<BasalWizard> {
   }
 
   Future<void> _saveInitialValue(double value) async {
-
     double updatedValue = initialInsulinValue + value;
     await prefs.setDouble('dose', updatedValue);
     print('dosage updated');
@@ -147,10 +147,11 @@ class _BasalWizardState extends State<BasalWizard> {
     return endtime!.difference(starttime!);
   }
 
-  void addInterval(DateTime startTime, DateTime endTime) {
-    String dosage = dosageController.text;
-    timeLinkedList.insert(startTime, endTime, dosage);
-  }
+  // void addInterval(DateTime startTime, DateTime endTime)  {
+  //   String dosage = dosageController.text;
+  //   timeLinkedList.insert(startTime, endTime, dosage);
+
+  // }
 
   void startResendTimer() {
     _resendTimer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -179,10 +180,8 @@ class _BasalWizardState extends State<BasalWizard> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
-    return Consumer2<CharacteristicProvider, Deviceprovider>(
-        builder: (context, value, device, child) {
-      return Scaffold(
-      resizeToAvoidBottomInset: true,
+    return Scaffold(
+        resizeToAvoidBottomInset: true,
         drawer: AppDrawerNavigation('INSULIN'),
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
         appBar: AppBar(
@@ -337,7 +336,7 @@ class _BasalWizardState extends State<BasalWizard> {
             ),
           ],
           backgroundColor: Theme.of(context).colorScheme.secondary,
-          bottom: device.getdevice == null
+          bottom: _bleManager.agvaDevice.value == null
               ? PreferredSize(
                   preferredSize: Size.fromHeight(35),
                   child: Container(
@@ -452,15 +451,15 @@ class _BasalWizardState extends State<BasalWizard> {
                 SizedBox(
                   height: height * 0.02,
                 ),
-                device.getdevice != null
+             _bleManager.agvaDevice.value != null
                     ? InkWell(
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
                             builder: (context) {
                               return Container(
-                                              color: Theme.of(context).colorScheme.primary,
-                               height: 350,
+                                color: Theme.of(context).colorScheme.primary,
+                                height: 350,
                                 width: MediaQuery.of(context).size.width,
                                 child: Padding(
                                   padding: const EdgeInsets.all(5.0),
@@ -520,7 +519,7 @@ class _BasalWizardState extends State<BasalWizard> {
                                       Container(
                                         height: 200,
                                         child: CupertinoDatePicker(
-                                            initialDateTime: dateTime,
+                                            initialDateTime: starttime,
                                             mode: CupertinoDatePickerMode.time,
                                             use24hFormat: true,
                                             showDayOfWeek: true,
@@ -579,7 +578,6 @@ class _BasalWizardState extends State<BasalWizard> {
                                           border: InputBorder.none,
                                           hintText: '0.0',
                                           hintStyle: TextStyle(
-                                
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .onInverseSurface,
@@ -608,14 +606,14 @@ class _BasalWizardState extends State<BasalWizard> {
                 SizedBox(
                   height: height * 0.03,
                 ),
-                device.getdevice != null
+             _bleManager.agvaDevice.value != null
                     ? InkWell(
                         onTap: () {
                           showModalBottomSheet(
                             context: context,
                             builder: (context) {
                               return Container(
-                                  color: Theme.of(context).colorScheme.primary,
+                                color: Theme.of(context).colorScheme.primary,
                                 height: 350,
                                 width: MediaQuery.of(context).size.width,
                                 child: Padding(
@@ -686,7 +684,7 @@ class _BasalWizardState extends State<BasalWizard> {
                                       Container(
                                         height: 200,
                                         child: CupertinoDatePicker(
-                                            initialDateTime: dateTime,
+                                            initialDateTime: DateTime.now(),
                                             mode: CupertinoDatePickerMode.time,
                                             use24hFormat: true,
                                             showDayOfWeek: true,
@@ -745,7 +743,6 @@ class _BasalWizardState extends State<BasalWizard> {
                                           border: InputBorder.none,
                                           hintText: '0.0',
                                           hintStyle: TextStyle(
-                                     
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .onInverseSurface,
@@ -774,108 +771,121 @@ class _BasalWizardState extends State<BasalWizard> {
                 SizedBox(
                   height: height * 0.03,
                 ),
-                device.getdevice != null
+        _bleManager.agvaDevice.value != null
                     ? InkWell(
-                      onTap: () {
-                        toggleDosageEdit();
-                      },
-                      child: Container(
-                          height: height * 0.055,
-                          width: width,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Dosage    ',
-                                  style: TextStyle(
-                                      color:
-                                          Theme.of(context).colorScheme.tertiary,
-                                      fontSize: height * 0.018),
-                                ),
-                                Icon(
-                                  Icons.info_outline,
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                ),
-                                SizedBox(
-                                  width: width * 0.3,
-                                  child: TextField(
-                                    cursorColor: Theme.of(context)
-                                        .colorScheme
-                                        .onInverseSurface,
-                                    selectionControls:
-                                        CupertinoTextSelectionControls(),
+                        onTap: () {
+                          toggleDosageEdit();
+                        },
+                        child: Container(
+                            height: height * 0.055,
+                            width: width,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Dosage    ',
                                     style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .onInverseSurface),
-                                    focusNode: dosageFocusNode,
-                                    controller: dosageController,
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                    readOnly: !isDosageEditable,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: '0.0',
-                                        hintStyle: TextStyle(
+                                            .tertiary,
+                                        fontSize: height * 0.018),
+                                  ),
+                                  Icon(
+                                    Icons.info_outline,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                  ),
+                                  SizedBox(
+                                    width: width * 0.3,
+                                    child: TextField(
+                                      cursorColor: Theme.of(context)
+                                          .colorScheme
+                                          .onInverseSurface,
+                                      selectionControls:
+                                          CupertinoTextSelectionControls(),
+                                      style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onInverseSurface,
-                                        )),
+                                              .onInverseSurface),
+                                      focusNode: dosageFocusNode,
+                                      controller: dosageController,
+                                      keyboardType: TextInputType.number,
+                                      textAlign: TextAlign.center,
+                                      readOnly: !isDosageEditable,
+                                      decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: '0.0',
+                                          hintStyle: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onInverseSurface,
+                                          )),
+                                    ),
                                   ),
-                                ),
-                                // Container(
-                                //   height: double.infinity,
-                                //   width: width * 0.001,
-                                //   color: Colors.grey,
-                                // ),
-                                // GestureDetector(
-                                //   onTap: () {
-                                    
-                                //   },
-                                //   child: SizedBox(
-                                //     child: Icon(
-                                //       Icons.edit,
-                                //       color:
-                                //           Theme.of(context).colorScheme.tertiary,
-                                //     ),
-                                //     height: height * 0.02,
-                                //   ),
-                                // ),
-                              ],
-                            ),
-                          )),
-                    )
+                                  // Container(
+                                  //   height: double.infinity,
+                                  //   width: width * 0.001,
+                                  //   color: Colors.grey,
+                                  // ),
+                                  // GestureDetector(
+                                  //   onTap: () {
+
+                                  //   },
+                                  //   child: SizedBox(
+                                  //     child: Icon(
+                                  //       Icons.edit,
+                                  //       color:
+                                  //           Theme.of(context).colorScheme.tertiary,
+                                  //     ),
+                                  //     height: height * 0.02,
+                                  //   ),
+                                  // ),
+                                ],
+                              ),
+                            )),
+                      )
                     : inActiveTextFields(context, 'Dosage', height),
                 SizedBox(
                   height: height * 0.03,
                 ),
                 Center(
-                  child: device.getdevice != null
+                  child: _bleManager.agvaDevice.value != null
                       ? Buttons(
-                          action: ()  {
-                              print('dosage');
-                            _saveInitialValue(double.parse(dosageController.text));
-                                print('dosage 2');
-                          addBasal(endTimeController.text, dosageController.text, context);
-                               
+                          action: () async {
                             DateTime writingStartTime =
                                 DateTime.parse(starttime.toString());
                             DateTime writingEndTime =
                                 DateTime.parse(endtime.toString());
 
-                            timeLinkedList.insert(
-                                writingStartTime, writingEndTime, dosage);
+                               _bleManager.readOrWriteCharacteristic(char, cmd, false);
 
-                            timeLinkedList.callFunctionsBetween(
-                                writingStartTime, writingEndTime);
+                            await addBasal(endTimeController.text,
+                                dosageController.text, context);
 
+                            _saveInitialValue(
+                                double.parse(dosageController.text));
+
+                            Future.delayed(Duration(seconds: 2), () {
+                              print('wrriting into BLE');
+                              _bleManager.readOrWriteCharacteristic(char, cmd, true);
+
+                              print('wrriting into BLE 2');
+
+                              timeLinkedList.insert(
+                                  writingStartTime, writingEndTime, dosage);
+
+                              timeLinkedList.callFunctionsBetween(
+                                  writingStartTime, writingEndTime);
+                            });
+                            
                             setState(() {
                               basalHistorylist.add(BasalHistory(
                                   basal: dosage,
@@ -914,6 +924,9 @@ class _BasalWizardState extends State<BasalWizard> {
                                   basalStatus = '';
                                 });
                               });
+                              startTimeController.clear();
+                              endTimeController.clear();
+                              dosageController.clear();
                             }
                           },
                           title: 'SUBMIT',
@@ -939,7 +952,6 @@ class _BasalWizardState extends State<BasalWizard> {
           ),
         ),
       );
-    });
   }
 
   inActiveTextFields(BuildContext context, String title, double height) {

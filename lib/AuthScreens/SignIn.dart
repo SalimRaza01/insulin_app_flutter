@@ -124,8 +124,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           style:
                               TextStyle(color: Color.fromARGB(255, 49, 49, 49)),
                           controller: controller,
-                          inputFormatters: controller.text.contains('@')
-                              ? [] // Set max length for phone number
+                          inputFormatters: controller.text.contains(RegExp(r'[a-z]'))
+                              ? [LengthLimitingTextInputFormatter(50)] // Set max length for phone number
                               : [LengthLimitingTextInputFormatter(10)],
                           decoration: InputDecoration(
                               border: UnderlineInputBorder(

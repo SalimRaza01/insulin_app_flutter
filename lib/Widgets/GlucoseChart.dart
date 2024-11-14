@@ -69,7 +69,7 @@ class _GlucosechartState extends State<Glucosechart> {
       '$gluCoseData/$userId',
       queryParameters: {'filter': filter},
     );
-    print(response);
+
     if (response.statusCode == 200) {
       final data = response.data['data'];
 

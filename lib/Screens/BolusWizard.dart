@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:newproject/Middleware/API.dart';
 import 'package:newproject/Widgets/Buttons.dart';
-import 'package:newproject/utils/CharacteristicProvider.dart';
+import 'package:newproject/utils/BLE_Provider.dart';
 import 'package:newproject/utils/Colors.dart';
-import 'package:newproject/utils/DeviceProvider.dart';
 import 'package:newproject/utils/Drawer.dart';
-import 'package:newproject/utils/ReadNotifier.dart';
 import 'package:newproject/utils/SharedPrefsHelper.dart';
 import 'package:newproject/utils/popover.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +36,7 @@ class BolusWizard extends StatefulWidget {
 }
 
 class _BolusWizardState extends State<BolusWizard> {
+  final BleManager _bleManager = BleManager();
   TextEditingController activeInsulinController = TextEditingController();
   bool showlist = false;
   double cb = 0.0;
@@ -52,11 +51,13 @@ class _BolusWizardState extends State<BolusWizard> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   double initialInsulinValue = 0.0;
 
+  
+
   @override
   void initState() {
-    super.initState();
     _loadDoseHistory();
     _loadInitialValue();
+    super.initState();
   }
 
   void _notifyUser(String message) {
@@ -115,87 +116,73 @@ class _BolusWizardState extends State<BolusWizard> {
     _notifyUser('History Deleted');
   }
 
-  _waitingDialogBox() {
-    return showDialog<void>(
+  _waitingDialogBox() async {
+    await showDialog<void>(
       context: _scaffoldKey.currentContext!,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return Consumer<ReadNotifier>(
-          builder: (context, readNotifier, child) {
-            Future.delayed(Duration(seconds: 4), () {
-              if (readNotifier.getack == true) {
-                _saveInitialValue(dose);
-                addBolusUnit(activeInsulinController.text, context);
+         Future.delayed(Duration(seconds: 2), () {
+      if (_bleManager.ackNotifier.value == true) {
+        ins = double.parse(activeInsulinController.text);
+        dose = ins;
+        _saveInitialValue(dose);
+        addBolusUnit(activeInsulinController.text, context);
+        activeInsulinController.clear();
 
-                ins = double.parse(activeInsulinController.text.toString());
-                dose = ins;
-                activeInsulinController.clear();
-                // Save dose to history
-                setState(() {
-                  doseHistory.insert(
-                      0, DoseEntry(dose: dose, timestamp: DateTime.now()));
-                });
+        setState(() {
+          doseHistory.insert(
+              0, DoseEntry(dose: dose, timestamp: DateTime.now()));
+        });
 
-                _saveDoseHistory();
-                Navigator.of(context).pop();
-                _successDialogBox();
-              } else {
-                Navigator.of(context).pop();
-                _failedDialogBox();
-              }
-            });
-
-            return AlertDialog(
-              title: Text(
-                'BOLUS STATUS',
-                style: TextStyle(
-                  color: Colors.white,
+        _saveDoseHistory();
+        Navigator.pop(context);
+        _successDialogBox();
+      } else {
+                Navigator.pop(context);
+        _failedDialogBox();
+      }
+    });
+        return AlertDialog(
+          title: Text(
+            'BOLUS STATUS',
+            style: TextStyle(color: Colors.white),
+          ),
+          icon: Icon(
+            Icons.medical_information_sharp,
+            color: Colors.white,
+          ),
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'CHECK INSULIN DEVICE',
+                  style: TextStyle(color: Colors.white),
                 ),
-              ),
-              icon: Icon(
-                Icons.medical_information_sharp,
-                color: Colors.white,
-              ),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'CHECK INSULIN DEVICE',
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Please confirm on insulin device to deliver bolus instantly..',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ],
+                SizedBox(height: 10),
+                Text(
+                  'Please confirm on insulin device to deliver bolus instantly..',
+                  style: TextStyle(color: Colors.white),
                 ),
-              ),
-            );
-          },
+              ],
+            ),
+          ),
         );
       },
     );
+   
   }
 
-
-
-  _successDialogBox() {
-    return showDialog<void>(
+  _successDialogBox() async {
+    await showDialog<void>(
       context: _scaffoldKey.currentContext!,
       barrierDismissible: false,
       builder: (BuildContext context) {
         Future.delayed(Duration(seconds: 2), () {
-          Navigator.of(context).pop();
-          bool ackFound = false;
-          Provider.of<ReadNotifier>(context, listen: false).updateDec(ackFound);
+       
+          Navigator.pop(context);
         });
         return AlertDialog(
           title: Text(
@@ -222,13 +209,19 @@ class _BolusWizardState extends State<BolusWizard> {
         );
       },
     );
+      setState(() {
+         _bleManager.ackNotifier.value == false;
+      });
   }
 
   _failedDialogBox() {
-    return showDialog<void>(
+    showDialog<void>(
       context: _scaffoldKey.currentContext!,
       barrierDismissible: false,
       builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: 2), () {
+          Navigator.pop(context);
+        });
         return AlertDialog(
           title: Text(
             'FAILED',
@@ -245,23 +238,21 @@ class _BolusWizardState extends State<BolusWizard> {
           ),
           actions: [
             ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'close',
-                  style: TextStyle(color: Colors.black),
-                ))
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'close',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
           ],
         );
       },
     );
-  }
+  } 
 
   @override
   void dispose() {
     activeInsulinController.dispose();
-
     super.dispose();
   }
 
@@ -270,8 +261,9 @@ class _BolusWizardState extends State<BolusWizard> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
-    return Consumer2<CharacteristicProvider, Deviceprovider>(
-        builder: (context, value, device, child) {
+    return ValueListenableBuilder(
+      valueListenable:  _bleManager.isDeviceConnected,
+      builder: (BuildContext context, dynamic isDeviceConnected, Widget? child) {
       return Scaffold(
         key: _scaffoldKey,
         drawer: AppDrawerNavigation('INSULIN'),
@@ -447,7 +439,7 @@ class _BolusWizardState extends State<BolusWizard> {
             ),
           ],
           backgroundColor: Theme.of(context).colorScheme.secondary,
-          bottom: device.getdevice == null
+          bottom: isDeviceConnected == false
               ? PreferredSize(
                   preferredSize: Size.fromHeight(35),
                   child: Container(
@@ -516,18 +508,87 @@ class _BolusWizardState extends State<BolusWizard> {
                 SizedBox(
                   height: height * 0.02,
                 ),
-                device.getdevice != null
-                    ? newMethod(
-                        context, 'INSULIN', activeInsulinController, height)
+                isDeviceConnected
+                    ? Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "INSULIN",
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                    fontSize: 16),
+                              ),
+                              Icon(
+                                Icons.info_outline,
+                                color: Theme.of(context).colorScheme.tertiary,
+                              ),
+                              SizedBox(
+                                width: 100,
+                                height: 30,
+                                child: TextField(
+                                  cursorColor: Theme.of(context)
+                                      .colorScheme
+                                      .onInverseSurface,
+                                  selectionControls:
+                                      CupertinoTextSelectionControls(),
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onInverseSurface),
+                                  onTapOutside: (PointerDownEvent event) {
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
+                                  },
+                                  controller: activeInsulinController,
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.right,
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: '0 unit',
+                                      hintStyle: TextStyle(
+                                          fontWeight: AppColor.lightWeight,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onInverseSurface)),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 4),
+                                child: Container(
+                                  height: 40,
+                                  width: 2,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              SizedBox(
+                                child: Icon(
+                                  Icons.edit,
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ))
                     : inActiveTextFields(context, 'INSULIN', height),
                 SizedBox(
                   height: height * 0.04,
                 ),
                 Center(
-                  child: device.getdevice != null
+                  child: isDeviceConnected
                       ? Buttons(
                           action: () {
-                            activeInsulinController.text.isEmpty ?  _notifyUser('Please Enter Insulin Dose') : showModalBottomSheet(
+                            activeInsulinController.text.isEmpty
+                                ? _notifyUser('Please Enter Insulin Dose')
+                                : showModalBottomSheet(
                                     context: context,
                                     builder: (context) {
                                       return Scaffold(
@@ -676,25 +737,19 @@ class _BolusWizardState extends State<BolusWizard> {
                                                   ],
                                                 ),
                                                 GestureDetector(
-                                                  onTap: () {
-                                                    // widget.onCharacteristicChecked(
-                                                    //     char, cmd, false);
+                                                  onTap: () async {
+                                                    setState(() {
+                                                      dose = double.parse(
+                                                          activeInsulinController
+                                                              .text);
+                                                    });
+
+                                                    _bleManager
+                                                        .readOrWriteCharacteristic(
+                                                            char, cmd, true);
 
                                                     Navigator.pop(context);
                                                     _waitingDialogBox();
-
-                                                    value.getBLEfunctionaltity(
-                                                        char, cmd, false);
-
-                                                    Future.delayed(
-                                                        Duration(seconds: 2),
-                                                        () {
-                                                      value
-                                                          .getBLEfunctionaltity(
-                                                              char, cmd, true);
-                                                      // widget.onCharacteristicChecked(
-                                                      //     char, cmd, true);
-                                                    });
                                                   },
                                                   child: Container(
                                                     height: height * 0.06,
@@ -761,71 +816,6 @@ class _BolusWizardState extends State<BolusWizard> {
         ),
       );
     });
-  }
-
-  newMethod(BuildContext context, String title,
-      TextEditingController controller, double height) {
-    return Container(
-        height: 50,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    fontSize: 16),
-              ),
-              Icon(
-                Icons.info_outline,
-                color: Theme.of(context).colorScheme.tertiary,
-              ),
-              SizedBox(
-                width: 100,
-                height: 30,
-                child: TextField(
-                  cursorColor: Theme.of(context).colorScheme.onInverseSurface,
-                  selectionControls: CupertinoTextSelectionControls(),
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.onInverseSurface),
-                  onTapOutside: (PointerDownEvent event) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  controller: controller,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '0 unit',
-                      hintStyle: TextStyle(
-                          fontWeight: AppColor.lightWeight,
-                          color:
-                              Theme.of(context).colorScheme.onInverseSurface)),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4),
-                child: Container(
-                  height: 40,
-                  width: 2,
-                  color: Colors.grey,
-                ),
-              ),
-              SizedBox(
-                child: Icon(
-                  Icons.edit,
-                  color: Theme.of(context).colorScheme.tertiary,
-                ),
-              ),
-            ],
-          ),
-        ));
   }
 
   inActiveTextFields(BuildContext context, String title, double height) {

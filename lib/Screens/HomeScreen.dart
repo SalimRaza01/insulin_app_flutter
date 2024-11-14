@@ -1,8 +1,6 @@
 // ignore_for_file: file_names, prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_new
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -18,14 +16,11 @@ import 'package:newproject/Widgets/BolusGraph.dart';
 import 'package:newproject/Widgets/InsulinChart.dart';
 import 'package:newproject/Widgets/ShimmerEffect.dart';
 import 'package:newproject/Widgets/WeightChart.dart';
+import 'package:newproject/utils/BLE_Provider.dart';
 import 'package:newproject/utils/SharedPrefsHelper.dart';
-import 'package:newproject/utils/CharacteristicProvider.dart';
 import 'package:newproject/utils/Colors.dart';
-import 'package:newproject/utils/DeviceConnectProvider.dart';
-import 'package:newproject/utils/DeviceProvider.dart';
 import 'package:newproject/utils/Drawer.dart';
 import 'package:newproject/utils/NutritionNotifier.dart';
-import 'package:newproject/utils/ReadNotifier.dart';
 import 'package:newproject/utils/config.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -37,11 +32,7 @@ import '../Widgets/SmartBolusWidget.dart';
 import '../Widgets/ResservoirWidget.dart';
 
 class HomeScreen extends StatefulWidget {
-  // final BluetoothDevice device;
-
-  HomeScreen({
-    super.key,
-  });
+  HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -52,27 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentIndex = 0;
   late Future<List<ExpenseData>> chartData;
   final pref = SharedPrefsHelper();
-
-  BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
-  String ecn = '';
-  Timer? _connectionCheckTimer;
-  BluetoothDevice? agvaDevice;
-  String finalString = 'cm+sync';
-  static String characteristicUuid = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-  late StreamSubscription<BluetoothConnectionState>? _stateSubscription;
-  BluetoothConnectionState _connectionState =
-      BluetoothConnectionState.disconnected;
-  List<BluetoothService>? _services = [];
-  List<ScanResult> _scanResults = [];
-  late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
-  late StreamSubscription<bool> _isScanningSubscription;
-  late StreamSubscription<BluetoothAdapterState> _adapterStateStateSubscription;
-
-  bool _isScanning = false;
-  String reservoirValue = '';
-  bool isDeviceConnected = false;
-  String? weight;
-  var indexClicked = 0;
+  final BleManager _bleManager = BleManager();
 
   Future<void> getUserDetails() async {
     print('API HIT');
@@ -96,193 +67,23 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _bleManager.initializeBluetoothListeners();
+    _bleManager.agvaDevice.addListener(_onDeviceFound);
 
     getUserDetails();
     chartData = _fetchChartData(periods[currentIndex]);
-    _adapterStateStateSubscription =
-        FlutterBluePlus.adapterState.listen((state) {
-      _adapterState = state;
-      onRefresh();
-      print('adapterState $state');
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final deviceNotifier =
-          Provider.of<Deviceprovider>(context, listen: false);
-      if (deviceNotifier.getdevice != null) {
-        agvaDevice = deviceNotifier.getdevice;
-    
-        getServices();
-        _startConnectionCheckTimer(agvaDevice!);
-      }
-    });
-
-    _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
-      _scanResults = results;
-      for (ScanResult r in _scanResults) {
-    
-        if (r.device.platformName.contains('AgVa')) {
-          agvaDevice = r.device;
-
-          if (FlutterBluePlus.isScanningNow) {
-          
-            FlutterBluePlus.stopScan();
-            Future.delayed(Duration(seconds: 2), () {
-              popupDevice(context, agvaDevice!);
-            });
-
-            // onConnectPressed(r.device);
-            _connectToDevice(r.device);
-          }
-          print('this is my device $agvaDevice');
-
-          break;
-        } else {
-        
-        }
-      }
-    });
-
-    _isScanningSubscription = FlutterBluePlus.isScanning.listen((state) {
-      print('scanning is running');
-      _isScanning = state;
-      if (mounted) {
-        setState(() {});
-      }
-    });
   }
 
-  void _connectToDevice(BluetoothDevice device) async {
-    await device.connect();
-
-    _startConnectionCheckTimer(device);
-  }
-
-  void _notifyUser(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
-  void _startConnectionCheckTimer(BluetoothDevice device) {
-    _connectionCheckTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
-      var state = await device.connectionState.first;
-      if (state == BluetoothConnectionState.disconnected) {
-        // _notifyUser("Device disconnected");
-        onRefresh();
-        BluetoothDevice? agvaDevice = null;
-        Provider.of<Deviceprovider>(context, listen: false)
-            .updateDevice(agvaDevice);
-        setState(() {
-          isDeviceConnected = false;
-          Provider.of<Deviceconnection>(context, listen: false)
-              .getDeviceConnection(isDeviceConnected);
-        });
-        timer.cancel();
-      }
-    });
+  void _onDeviceFound() {
+    if (_bleManager.agvaDevice.value != null) {
+      popupDevice(context, _bleManager.agvaDevice.value!, _bleManager);
+    }
   }
 
   @override
   void dispose() {
-    _adapterStateStateSubscription.cancel();
-    _scanResultsSubscription.cancel();
-    _isScanningSubscription.cancel();
+    _bleManager.agvaDevice.removeListener(_onDeviceFound);
     super.dispose();
-  }
-
-  Future onRefresh() {
-    print("Scanning is running");
-    if (_isScanning == false) {
-               print('Scanning');
-      FlutterBluePlus.startScan(timeout: const Duration(seconds: 1));
-    }
-    if (mounted) {}
-    return Future.delayed(Duration(milliseconds: 500));
-  }
-
-  getServices() async {
-    print('get Services from device');
-    _services = await agvaDevice?.discoverServices();
-
-    if (_services != null) {
-      onCharacteristicChecked(characteristicUuid, finalString, true);
-      Provider.of<CharacteristicProvider>(context, listen: false)
-          .getFunction(onCharacteristicChecked);
-      print('written code');
-    } else {
-      print('services are null');
-    }
-  }
-
-  BluetoothCharacteristic? findCharacteristic(String characteristicUuid) {
-    for (BluetoothService service in _services!) {
-      for (BluetoothCharacteristic chr in service.characteristics) {
-  
-        if (chr.uuid.toString() == characteristicUuid) {
-          return chr;
-        }
-      }
-    }
-    return null;
-  }
-
-  Future<void> onCharacteristicChecked(
-      String characteristicUuid, String text, bool isRead) async {
-    try {
-      BluetoothCharacteristic? c = findCharacteristic(characteristicUuid);
-
-      if (c != null) {
-  
-        if (agvaDevice != null) {
-          setState(() {
-            isDeviceConnected = true;
-            Provider.of<Deviceconnection>(context, listen: false)
-                .getDeviceConnection(isDeviceConnected);
-
-            Provider.of<Deviceprovider>(context, listen: false)
-                .updateDevice(agvaDevice);
-          });
-        }
-        if (!isRead) {
-          await c.write(utf8.encode(text), withoutResponse: false, timeout: 10);
-          // await Future.delayed(Duration(seconds: 2), () {
-          //   print('inside writing code');
-
-          // setState(() {
-          //   isDeviceConnected = true;
-          //   if (agvaDevice != null) {
-          //     Provider.of<Deviceprovider>(context, listen: false)
-          //         .updateDevice(agvaDevice);
-          //   }
-          // });
-          // });
-        } else {
-          var enco = await c.read();
-
-          var dec = utf8.decode(enco);
-
-          print("This is decoded data $dec");
-
-          if (dec.contains('ACK')) {
-            setState(() {
-              bool ackFound = true;
-              isDeviceConnected = true;
-              Provider.of<ReadNotifier>(context, listen: false)
-                  .updateDec(ackFound);
-              if (agvaDevice != null) {
-                Provider.of<Deviceprovider>(context, listen: false)
-                    .updateDevice(agvaDevice);
-              }
-            });
-          } else {}
-
-          print('encoooo $dec');
-        }
-      } else {}
-    } catch (e) {
-      log("this is error ${e}");
-    }
   }
 
   bool showBatteryInfo = false;
@@ -317,8 +118,6 @@ class _HomeScreenState extends State<HomeScreen> {
       throw Exception('Invalid period');
     }
 
-    print(filter);
-
     final _sharedPreference = SharedPrefsHelper();
     final String? userId = await _sharedPreference.getString('userId');
 
@@ -327,7 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
       queryParameters: {'filter': filter},
     );
     if (response.statusCode == 200) {
-      print('api hit nutrition');
       final responseData = response.data['data'] as List;
       return responseData.map((item) => ExpenseData.fromJson(item)).toList();
     } else {
@@ -354,199 +152,236 @@ class _HomeScreenState extends State<HomeScreen> {
             .nutritionUpdate(false);
       }
 
-      return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          actions: <Widget>[
-            GestureDetector(
-              onTap: () => {
-                // print('this is show dialog box $agvaDevice'),
-                if (_adapterState == BluetoothAdapterState.off)
-                  {
-                    print('this show BluetoothAdapterState $_adapterState'),
-                    showModalBottomSheet<void>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Container(
-                          height: height * 0.2,
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 31, 29, 87),
+      return ValueListenableBuilder(
+        valueListenable: _bleManager.isScanningRunning,
+        builder: (context, isScanning, _) {
+          print('is scanning in homescreen $isScanning');
+          return ValueListenableBuilder(
+            valueListenable: _bleManager.isDeviceConnected,
+            builder: (context, isConnected, _) {
+              return ValueListenableBuilder(
+                valueListenable: _bleManager.agvaDevice,
+                builder: (context, agvaDevice, _) {
+                  print('Started Listening 4 ${_bleManager.agvaDevice.value}');
+                  return Scaffold(
+                    backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                    appBar: AppBar(
+                      iconTheme: IconThemeData(color: Colors.white),
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      actions: <Widget>[
+                        GestureDetector(
+                          onTap: () => {
+                            // if (_adapterState == BluetoothAdapterState.off)
+                            //   {
+                            //     print('this show BluetoothAdapterState $_adapterState'),
+                            //     showModalBottomSheet<void>(
+                            //       context: context,
+                            //       builder: (BuildContext context) {
+                            //         return Container(
+                            //           height: height * 0.2,
+                            //           decoration: BoxDecoration(
+                            //             color: Color.fromARGB(255, 31, 29, 87),
+                            //           ),
+                            //           child: Padding(
+                            //             padding: const EdgeInsets.all(20),
+                            //             child: Row(
+                            //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //               crossAxisAlignment: CrossAxisAlignment.start,
+                            //               children: [
+                            //                 Column(
+                            //                   crossAxisAlignment: CrossAxisAlignment.start,
+                            //                   children: [
+                            //                     Text(
+                            //                       "Bluetooth is turned off",
+                            //                       style: TextStyle(
+                            //                         fontSize: 20,
+                            //                         color: Theme.of(context)
+                            //                             .colorScheme
+                            //                             .primary,
+                            //                       ),
+                            //                     ),
+                            //                     SizedBox(
+                            //                       height: 20,
+                            //                     ),
+                            //                     Text(
+                            //                       "Please turn on your bluetooth to connect insulin ",
+                            //                       style: TextStyle(
+                            //                         fontSize: 12,
+                            //                         color: Theme.of(context)
+                            //                             .colorScheme
+                            //                             .primary,
+                            //                       ),
+                            //                     ),
+                            //                   ],
+                            //                 ),
+                            //                 Icon(
+                            //                   Icons.bluetooth_disabled,
+                            //                   size: 40,
+                            //                   color: Theme.of(context).colorScheme.primary,
+                            //                 )
+                            //               ],
+                            //             ),
+                            //           ),
+                            //         );
+                            //       },
+                            //     ),
+                            //   }
+                            print(
+                                "check connection and device $isConnected $agvaDevice"),
+                            if (isConnected == false)
+                              {
+                                print(agvaDevice),
+                                print(isConnected),
+                                print("Device not connected"),
+                                _bleManager.startScanIfNotScanning()
+                              }
+                          },
+                          child: Image.asset(
+                            // setImage(_bleManager.isDeviceConnected.value),
+                            isScanning == true
+                                ? 'assets/images/scanning.gif'
+                                :
+                            isConnected
+                                ? 'assets/images/insulin_connected.png'
+                                : 'assets/images/insulinIcon.png',
+
+                            width: 25,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Bluetooth is turned off",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    Text(
-                                      "Please turn on your bluetooth to connect insulin ",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Icon(
-                                  Icons.bluetooth_disabled,
-                                  size: 40,
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
-                              ],
-                            ),
+                        ),
+                        SizedBox(
+                          width: 25,
+                        ),
+                        GestureDetector(
+                          onTap: _addBloodCount,
+                          child: Image.asset(
+                            'assets/images/notifi.png',
+                            height: 22,
                           ),
-                        );
-                      },
+                        ),
+                        SizedBox(
+                          width: 20,
+                        )
+                      ],
                     ),
-                  }
-                else if (isDeviceConnected == false && agvaDevice == null)
-                  {print("Device not connected"), onRefresh()}
-              },
-              child: Image.asset(
-                setImage(isDeviceConnected),
-                width: 25,
-              ),
-            ),
-            SizedBox(
-              width: 25,
-            ),
-            GestureDetector(
-              onTap: _addBloodCount,
-              child: Image.asset(
-                'assets/images/notifi.png',
-                height: 22,
-              ),
-            ),
-            SizedBox(
-              width: 20,
-            )
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              children: [
-                //Today's_Status_Widget
-                SizedBox(height: height * 0.020),
-                GestureDetector(child: TodaysStatus()),
+                    body: SingleChildScrollView(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Column(
+                          children: [
+                            //Today's_Status_Widget
+                            SizedBox(height: height * 0.020),
+                            GestureDetector(child: TodaysStatus()),
 
-                SizedBox(height: height * 0.015),
-                //Avarage_Insulin_Intake_Widget
+                            SizedBox(height: height * 0.015),
+                            //Avarage_Insulin_Intake_Widget
 
-                GestureDetector(
-                    onTap: () {
-                      if (isDeviceConnected == true) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SmartBolusScreen()));
-                      } else {
-                        _noDeviceFoundTopModel();
-                      }
-                    },
-                    child: SmartBolusWidget()),
+                            GestureDetector(
+                                onTap: () {
+                                  if (isConnected) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                SmartBolusScreen()));
+                                  } else {
+                                    _noDeviceFoundTopModel();
+                                  }
+                                },
+                                child: SmartBolusWidget()),
 
-                SizedBox(height: height * 0.015),
-                GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => NutritionScreen()));
-                    },
-                    child: newMethod(height, width)),
+                            SizedBox(height: height * 0.015),
+                            GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              NutritionScreen()));
+                                },
+                                child: newMethod(height, width)),
 
-                SizedBox(height: height * 0.015),
+                            SizedBox(height: height * 0.015),
 
-                GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => WeightScreen()));
-                    },
-                    child: WeightChart()),
+                            GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              WeightScreen()));
+                                },
+                                child: WeightChart()),
 
-                SizedBox(height: height * 0.015),
+                            SizedBox(height: height * 0.015),
 
-                //GlucoseChart_Widget
-                GestureDetector(
-                    onTap: () {
-                      if (isDeviceConnected == true) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => GlucoseScreen(
-                                      agvaDevice: agvaDevice,
-                                    )));
-                      } else {
-                        _noDeviceFoundTopModel();
-                      }
-                    },
-                    child: Glucosechart()),
+                            //GlucoseChart_Widget
+                            GestureDetector(
+                                onTap: () {
+                                  if (isConnected) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                GlucoseScreen()));
+                                  } else {
+                                    _noDeviceFoundTopModel();
+                                  }
+                                },
+                                child: Glucosechart()),
 
-                SizedBox(height: height * 0.015),
-                GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InsulinScreen()));
-                    },
-                    child: Insulinchart()),
+                            SizedBox(height: height * 0.015),
+                            GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              InsulinScreen()));
+                                },
+                                child: Insulinchart()),
 
-                SizedBox(height: height * 0.015),
-                //InsulinkChart_Widget
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => BasalWizard()));
-                  },
-                  child: Basalgraph(),
-                ),
-                SizedBox(height: height * 0.015),
+                            SizedBox(height: height * 0.015),
+                            //InsulinkChart_Widget
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => BasalWizard()));
+                              },
+                              child: Basalgraph(),
+                            ),
+                            SizedBox(height: height * 0.015),
 
-                GestureDetector(
-                  onTap: () async {
-                    await Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => BolusWizard()));
-                  },
-                  child: Bolusgraph(),
-                ),
-                SizedBox(height: height * 0.015),
+                            GestureDetector(
+                              onTap: () async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => BolusWizard()));
+                              },
+                              child: Bolusgraph(),
+                            ),
+                            SizedBox(height: height * 0.015),
 
-                RessorvoirWidget(),
+                            RessorvoirWidget(),
 
-                SizedBox(height: height * 0.015),
-                //Bettery_Widget
-                BatteryStatus(),
-                SizedBox(height: height * 0.015),
-                //Patch_Widget
-              ],
-            ),
-          ),
-        ),
-        drawer: AppDrawerNavigation('HOMESCREEN'),
+                            SizedBox(height: height * 0.015),
+                            //Bettery_Widget
+                            BatteryStatus(),
+                            SizedBox(height: height * 0.015),
+                            //Patch_Widget
+                          ],
+                        ),
+                      ),
+                    ),
+                    drawer: AppDrawerNavigation('HOMESCREEN'),
+                  );
+                },
+              );
+            },
+          );
+        },
       );
     });
   }
@@ -734,9 +569,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> popupDevice(BuildContext context, BluetoothDevice device) {
+  Future<void> popupDevice(
+      BuildContext context, BluetoothDevice device, BleManager bleManager) {
+        print('POPUP Showen');
     return showModalBottomSheet<void>(
         context: context,
+        isDismissible: false,
         builder: (BuildContext context) {
           final height = MediaQuery.of(context).size.height;
           final width = MediaQuery.of(context).size.width;
@@ -771,8 +609,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         InkWell(
-                          onTap: () {
+                          onTap: () async {
                             Navigator.pop(context);
+                            _bleManager.disconnectDevice(device);
                           },
                           child: Image.asset(
                             'assets/images/ic_remove.png',
@@ -791,7 +630,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          getServices();
+                          bleManager.discoverServices(device);
+                          print('AGVA DEVICE $device');
 
                           Navigator.pop(context);
                         },
@@ -820,18 +660,6 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         });
   }
-
-  String setImage(isDeviceConnected) {
-    if (isDeviceConnected) {
-      return 'assets/images/insulin_connected.png';
-    }   else if (_isScanning) {
-      return 'assets/images/scanning.gif';
-    } else {
-      return 'assets/images/insulinIcon.png';
-    }
-  }
-
-
 
   void showPopupMenu(BuildContext context) {
     showMenu(
@@ -1074,7 +902,6 @@ class BloodCount extends StatelessWidget {
                                     Padding(
                                       padding: EdgeInsets.all(10),
                                       child: Container(
-                               
                                         decoration: BoxDecoration(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -1092,7 +919,7 @@ class BloodCount extends StatelessWidget {
                                               width: width * 0.03,
                                             ),
                                             SizedBox(
-                                                             width: width / 6,
+                                              width: width / 6,
                                               child: TextField(
                                                 keyboardType:
                                                     TextInputType.number,
@@ -1104,11 +931,13 @@ class BloodCount extends StatelessWidget {
                                                       .colorScheme
                                                       .onInverseSurface,
                                                 ),
-                                                controller: bloodCountController,
+                                                controller:
+                                                    bloodCountController,
                                                 decoration: InputDecoration(
                                                     border: InputBorder.none,
-                                                    hintText: 'Enter Blood Count'
-                                                        .toUpperCase(),
+                                                    hintText:
+                                                        'Enter Blood Count'
+                                                            .toUpperCase(),
                                                     hintStyle: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w200)),
@@ -1124,7 +953,6 @@ class BloodCount extends StatelessWidget {
                                     Padding(
                                       padding: EdgeInsets.all(10),
                                       child: Container(
-                               
                                         decoration: BoxDecoration(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -1142,7 +970,7 @@ class BloodCount extends StatelessWidget {
                                               width: width * 0.03,
                                             ),
                                             SizedBox(
-                                                             width: width / 6,
+                                              width: width / 6,
                                               child: TextField(
                                                 keyboardType:
                                                     TextInputType.number,
@@ -1154,11 +982,13 @@ class BloodCount extends StatelessWidget {
                                                       .colorScheme
                                                       .onInverseSurface,
                                                 ),
-                                                controller: bloodPressureController,
+                                                controller:
+                                                    bloodPressureController,
                                                 decoration: InputDecoration(
                                                     border: InputBorder.none,
-                                                    hintText: 'Enter Blood Pressure'
-                                                        .toUpperCase(),
+                                                    hintText:
+                                                        'Enter Blood Pressure'
+                                                            .toUpperCase(),
                                                     hintStyle: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w200)),

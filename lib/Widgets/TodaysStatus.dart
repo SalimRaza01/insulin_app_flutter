@@ -35,7 +35,7 @@ String updateDate = '';
 
       if (response.statusCode == 200) {
         var data = response.data['data'][0];
-         print('my user insulin 2 $data ${response.data}');
+   
      
         setState(() {
           insulinDose = double.parse(data['insulinCount']);

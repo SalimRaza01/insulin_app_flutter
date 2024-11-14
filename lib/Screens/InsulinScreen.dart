@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:newproject/utils/BLE_Provider.dart';
 import 'package:newproject/utils/SharedPrefsHelper.dart';
 import 'package:newproject/Widgets/BasalGraph.dart';
 import 'package:newproject/Widgets/BolusGraph.dart';
-import 'package:newproject/utils/DeviceConnectProvider.dart';
-import 'package:provider/provider.dart';
 import '../utils/Colors.dart';
 
 class InsulinScreen extends StatefulWidget {
@@ -15,14 +14,14 @@ class InsulinScreen extends StatefulWidget {
 }
 
 class _InsulinScreenState extends State<InsulinScreen> {
+    final BleManager _bleManager = BleManager();
   bool showgraph = false;
   DateTime selectedDate = DateTime.now();
   String formattedstartTime = '';
   Color? activeColor;
-  bool isDeviceConnected = false;
   String _selectedText = 'Insulin';
-  String? totalBasalunit;
-  String? totalBolusunit;
+  double? totalBasalunit;
+  double? totalBolusunit;
   final pref = SharedPrefsHelper();
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -42,13 +41,13 @@ class _InsulinScreenState extends State<InsulinScreen> {
   @override
   void initState() {
     super.initState();
-    totalBasalunit = pref.getString('totalbasalvalue');
-    totalBolusunit = pref.getString('totalbolusvalue');
+    totalBasalunit = double.parse(pref.getString('totalbasalvalue')!);
+    totalBolusunit = double.parse(pref.getString('totalbolusvalue')!);
     print(totalBasalunit);
     print(totalBolusunit);
 
     totalDeliveredValue =
-        double.parse(totalBasalunit!) + double.parse(totalBolusunit!);
+        totalBasalunit! + totalBolusunit!;
   }
 
   @override
@@ -73,9 +72,7 @@ class _InsulinScreenState extends State<InsulinScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Consumer<Deviceconnection>(
-          builder: (context, value, child) {
-            return Container(
+        child:Container(
               child: Column(
                 children: [
                   Container(
@@ -128,16 +125,16 @@ class _InsulinScreenState extends State<InsulinScreen> {
                               Row(
                                 children: [
                                   Icon(
-                                    value.isDeviceConnected == true
+                                    _bleManager.isDeviceConnected.value == true
                                         ? Icons.check
                                         : Icons.close,
-                                    color: value.isDeviceConnected == true
+                                    color:             _bleManager.isDeviceConnected.value == true
                                         ? Colors.green
                                         : Colors.red,
                                   ),
                                   SizedBox(width: 8),
                                   Text(
-                                    value.isDeviceConnected == true
+                                         _bleManager.isDeviceConnected.value == true
                                         ? 'Insulin Pump: Active'
                                         : 'Insulin Pump: Inactive',
                                     style: TextStyle(
@@ -160,7 +157,7 @@ class _InsulinScreenState extends State<InsulinScreen> {
                                   ),
                                   SizedBox(width: 10),
                                   Text(
-                                 totalDeliveredValue == null ? '0.0 U' : '${totalDeliveredValue.toString()} U ' ,
+                                 totalDeliveredValue == null ? '0.0 U' : '${totalDeliveredValue!.toStringAsFixed(2)} U ' ,
                                     style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -228,7 +225,7 @@ class _InsulinScreenState extends State<InsulinScreen> {
                                     ),
                                   ),
                                   Text(
-                                    '${pref.getString('totalbolusvalue')!} U',
+                                    '${totalBolusunit?.toStringAsFixed(2)} U',
                                     style: TextStyle(
                                         color: Theme.of(context)
                                             .colorScheme
@@ -289,7 +286,7 @@ class _InsulinScreenState extends State<InsulinScreen> {
                                     ),
                                   ),
                                   Text(
-                                    '${pref.getString('totalbasalvalue')!} U',
+                                    '${totalBasalunit?.toStringAsFixed(2)} U',
                                     style: TextStyle(
                                       fontSize: height * 0.025,
                                       fontWeight: FontWeight.bold,
@@ -328,9 +325,7 @@ class _InsulinScreenState extends State<InsulinScreen> {
                         child: Bolusgraph()),
                 ],
               ),
-            );
-          },
-        ),
+            )
       ),
     );
   }

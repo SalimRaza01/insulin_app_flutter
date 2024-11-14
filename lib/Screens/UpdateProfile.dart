@@ -83,7 +83,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
   double tempAge = 18;
   bool diabeties = false;
   bool? hypertension = false;
-  bool isProfileCompleted = false;
   bool showCityList = false;
   bool showStatelist = false;
   DateTime selectedData = DateTime.now();
@@ -1328,7 +1327,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                                         : weightController.text,
                                     widget.diabetes2,
                                     widget.hyperTension2,
-                                    isProfileCompleted,
+                                    true,
                                     emailController.text.isEmpty
                                         ? widget.email
                                         : emailController.text,

@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:newproject/Middleware/API.dart';
 import 'package:newproject/Middleware/NutritionMiddleware.dart';
 import 'package:newproject/Screens/homeScreen.dart';
 import 'package:newproject/model/NutritionDonutData.dart';
+import 'package:newproject/utils/BLE_Provider.dart';
 import 'package:newproject/utils/Colors.dart';
-import 'package:newproject/utils/DeviceProvider.dart';
 import 'package:newproject/utils/GlucoseNotifier.dart';
 import 'package:newproject/utils/SharedPrefsHelper.dart';
 import 'package:newproject/utils/config.dart';
@@ -30,8 +29,6 @@ final List<ChartDataInfo> data24Hours = List.generate(
 );
 
 class GlucoseScreen extends StatefulWidget {
-  final BluetoothDevice? agvaDevice;
-  const GlucoseScreen({this.agvaDevice});
 
   @override
   State<GlucoseScreen> createState() => _GlucoseScreenState();
@@ -40,6 +37,7 @@ class GlucoseScreen extends StatefulWidget {
 class _GlucoseScreenState extends State<GlucoseScreen> {
   TextEditingController enterBgcontroller = TextEditingController();
   Future<List<NutritionDonutDataItem>>? _nutritionDonutData;
+  final BleManager _bleManager = BleManager();
   String currentView = "enterbg";
   bool navigate = false;
   bool deviceStatus = false;
@@ -70,9 +68,7 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    return Consumer<Deviceprovider>(builder: (context, deviceNotifier, child) {
-      final agvaDevice = deviceNotifier.getdevice;
-      return Scaffold(
+    return Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Theme.of(context).colorScheme.secondary,
         appBar: AppBar(
@@ -347,7 +343,6 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
           ],
         ),
       );
-    });
   }
 
   Row emptyUi(double height, double width) {

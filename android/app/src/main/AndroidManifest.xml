@@ -2,11 +2,15 @@
 <uses-permission android:name="android.permission.CAMERA"/>
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
      <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_..." />
      <!-- New Bluetooth permissions in Android 12
      https://developer.android.com/about/versions/12/features/bluetooth-permissions -->
      <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
      <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+   
+
      <!-- legacy for Android 11 or lower -->
      <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
      <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
@@ -44,6 +48,14 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <service
+        android:enabled="true"
+        android:exported="true"
+        android:stopWithTask="false"
+        android:foregroundServiceType="dataSync"
+        android:name="id.flutter.flutter_background_service.BackgroundService"
+           
+        />
     </application>
 </manifest>
 

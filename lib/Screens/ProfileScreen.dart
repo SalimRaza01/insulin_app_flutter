@@ -144,6 +144,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.of(context).pop();
               },
             ),
+            Visibility(
+              visible: _image != null,
+              child: ListTile(
+                leading: Icon(
+                  Icons.cancel,
+                  color: Colors.red,
+                ),
+                title: Text(
+                  'Remove Current Profile',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+                onTap: ()  {
+                  // setState(() {
+                  //   _image = null;
+                  // });
+                  //  SharedPrefsHelper()
+                  //     .putImageFile('profileImage', _image!);
+
+                    Navigator.of(context).pop();
+                
+                },
+              ),
+            ),
             ListTile(
               leading: Icon(
                 Icons.cancel,
@@ -190,9 +215,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (value.updatedProfile == true) {
               getProfileData();
               Future.delayed(Duration(seconds: 2), () {
-            Provider.of<ProfileUpdateNotifier>(context, listen: false)
-                .updateProfile(false);
-          });
+                Provider.of<ProfileUpdateNotifier>(context, listen: false)
+                    .updateProfile(false);
+              });
             }
             return SingleChildScrollView(
               child: Container(
@@ -704,8 +729,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 70),
                                     child: GestureDetector(
-                                        onTap: ()  {
-                                        Navigator.push(
+                                        onTap: () {
+                                          Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
@@ -725,8 +750,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           selectedGender,
                                                           hyperTension2,
                                                           diabetes2)));
-                                          
-                                   
                                         },
                                         child: Container(
                                           height: height * 0.06,
@@ -781,15 +804,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ? ClipOval(
                                   child: Image.asset(
                                     'assets/images/avatar.png',
-                                    height: height * 0.15,
+                                    height: height * 0.14,
                                     fit: BoxFit.cover,
                                   ),
                                 )
                               : ClipOval(
                                   child: Image.file(
                                     _image!,
-                                    height: height * 0.15,
-               
+                                    height: height * 0.14,
                                     fit: BoxFit.cover,
                                   ),
                                 ),

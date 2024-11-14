@@ -51,7 +51,7 @@ class _WeightChartState extends State<WeightChart> {
       '$getWeightChartData/$userId',
       queryParameters: {'filter': filter},
     );
-    print(response);
+
     if (response.statusCode == 200) {
       final data = response.data['data'];
 

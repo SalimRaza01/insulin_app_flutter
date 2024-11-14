@@ -11,7 +11,7 @@ class AuthProvider with ChangeNotifier {
     try {
       Response response =
           await post(Uri.parse(signInApi), body: {'userId': controller});
- 
+
       if (response.statusCode == 200) {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => SigninOTP(controller)));
@@ -64,15 +64,16 @@ class OtpProvider with ChangeNotifier {
       print('asda');
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-print("login response $data");
+        print("login response $data");
         String id = data["data"]["_id"];
         bool isProfileCompleted = data['data']['isProfileCompleted'];
         bool isDeviceSetup = data['data']['isDeviceSetup'];
-   
+
         _sharedPreference.putString('userId', id);
         _sharedPreference.putBool("isLoggedIn", true);
         _sharedPreference.putBool('isProfileCompleted', isProfileCompleted);
         _sharedPreference.putBool('isDeviceSetup', isDeviceSetup);
+        _sharedPreference.putString('weight', data['data']['weight']);
 
         print('successfull');
       } else {
