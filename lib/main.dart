@@ -1,35 +1,36 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:newproject/AuthScreens/SetupProfile.dart';
-import 'package:newproject/AuthScreens/SplashScreen.dart';
-import 'package:newproject/AuthScreens/auth_Provider.dart';
-import 'package:newproject/utils/BLE_Provider.dart';
-import 'package:newproject/utils/SharedPrefsHelper.dart';
-import 'package:newproject/Screens/AuthModule.dart';
-import 'package:newproject/Screens/BasalWizard.dart';
-import 'package:newproject/Screens/BolusWizard.dart';
-import 'package:newproject/Screens/DeviceSetupScreen.dart';
-import 'package:newproject/Screens/DevicesScreen.dart';
-import 'package:newproject/Screens/GlucoseScreen.dart';
-import 'package:newproject/Screens/HomeScreen.dart';
-import 'package:newproject/Screens/InsulinScreen.dart';
-import 'package:newproject/Screens/NutritionScreen.dart';
-import 'package:newproject/Screens/ProfileScreen.dart';
-import 'package:newproject/Screens/SettingsScreen.dart';
-import 'package:newproject/Screens/SmartbolusScreen.dart';
-import 'package:newproject/Screens/WeightScreen.dart';
-import 'package:newproject/utils/BasalDeliveryNotifier.dart';
-import 'package:newproject/utils/BolusDeliveryNotifier.dart';
-import 'package:newproject/utils/GlucoseNotifier.dart';
-import 'package:newproject/utils/NutritionNotifier.dart';
-import 'package:newproject/utils/SmartBolusDelivery.dart';
-import 'package:newproject/utils/Theme.dart';
-import 'package:newproject/utils/ThemeProvider.dart';
-import 'package:newproject/utils/UpdateProfileNotifier.dart';
-import 'package:newproject/utils/WeightNotifier.dart';
-import 'package:newproject/utils/flutter_background_service.dart';
 import 'package:provider/provider.dart';
+import 'core/services/bluetooth_service_provider.dart';
+import 'core/theme/app_theme.dart';
+import 'core/utils/sharedpref_utils.dart';
+import 'core/services/flutter_background_service.dart';
+import 'data/providers/basal_delivery_provider.dart';
+import 'data/providers/bolus_delivery_provider.dart';
+import 'data/providers/glucose_provider.dart';
+import 'data/providers/nutrition_provider.dart';
+import 'data/providers/SmartBolusDelivery.dart';
+import 'data/providers/theme_provider.dart';
+import 'data/providers/profile_updated_provider.dart';
+import 'data/providers/auth_provider.dart';
+import 'data/providers/weight_provider.dart';
+import 'presentation/screens/basal_screen.dart';
+import 'presentation/screens/bolus_screen.dart';
+import 'presentation/screens/device_setup_screen.dart';
+import 'presentation/screens/devices_screen.dart';
+import 'presentation/screens/glucose_screen.dart';
+import 'presentation/screens/home_screen.dart';
+import 'presentation/screens/insulin_screen.dart';
+import 'presentation/screens/nutrition_screen.dart';
+import 'presentation/screens/profile_screen.dart';
+import 'presentation/screens/settings_screen.dart';
+import 'presentation/screens/setup_profile_screen.dart';
+import 'presentation/screens/smartbolus_screen.dart';
+import 'presentation/screens/splash_screen.dart';
+import 'presentation/screens/weight_screen.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -99,7 +100,6 @@ class MyApp extends StatelessWidget {
             "/BasalWizard": (context) => BasalWizard(),
             "/SmartBolusScreen": (context) => SmartBolusScreen(),
             "/DevicesScreen": (context) => DevicesScreen(),
-            "/Login": (context) => Login(),
           },
         );
       },
