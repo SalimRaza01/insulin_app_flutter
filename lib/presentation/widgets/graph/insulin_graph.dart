@@ -10,7 +10,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import '../../../data/providers/basal_delivery_provider.dart';
 import '../../../data/providers/bolus_delivery_provider.dart';
 import '../../../data/providers/glucose_provider.dart';
-import '../../../data/providers/SmartBolusDelivery.dart';
+import '../../../data/providers/smart_bolus_delivery_provider.dart';
 
 class ChartDataInfo {
   ChartDataInfo(this.time, this.value, [this.color]);

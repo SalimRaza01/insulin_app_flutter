@@ -4,8 +4,6 @@ import '../../data/models/search_meal_model.dart';
 import '../utils/sharedpref_utils.dart';
 import 'api_config.dart';
 
-
-
 Future<List<FoodItem>> fetchFoodItem(String foodName) async {
   final dio = Dio();
   final response = await dio.get(

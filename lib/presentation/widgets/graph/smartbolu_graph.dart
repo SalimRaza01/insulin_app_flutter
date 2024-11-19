@@ -5,8 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/sharedpref_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-
-import '../../../data/providers/SmartBolusDelivery.dart';
+import '../../../data/providers/smart_bolus_delivery_provider.dart';
 import '../../animations/animation_shimmer.dart';
 
 class ChartDataInfo {

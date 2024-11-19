@@ -12,7 +12,7 @@ import 'data/providers/basal_delivery_provider.dart';
 import 'data/providers/bolus_delivery_provider.dart';
 import 'data/providers/glucose_provider.dart';
 import 'data/providers/nutrition_provider.dart';
-import 'data/providers/SmartBolusDelivery.dart';
+import 'data/providers/smart_bolus_delivery_provider.dart';
 import 'data/providers/theme_provider.dart';
 import 'data/providers/profile_updated_provider.dart';
 import 'data/providers/auth_provider.dart';

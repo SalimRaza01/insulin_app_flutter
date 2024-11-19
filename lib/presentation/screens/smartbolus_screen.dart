@@ -7,7 +7,7 @@ import '../../core/services/bluetooth_service_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/sharedpref_utils.dart';
 import '../../data/models/search_meal_model.dart';
-import '../../data/providers/SmartBolusDelivery.dart';
+import '../../data/providers/smart_bolus_delivery_provider.dart';
 import '../animations/animation_shimmer.dart';
 import '../widgets/drawer_widget.dart';
 import 'package:provider/provider.dart';

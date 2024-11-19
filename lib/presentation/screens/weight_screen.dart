@@ -10,7 +10,7 @@ import '../../core/api/api_config.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/sharedpref_utils.dart';
 import '../../data/models/weight_model.dart';
-import '../../data/providers/WeightNotifier.dart';
+import '../../data/providers/weight_provider.dart';
 import '../animations/animation_shimmer.dart';
 import '../widgets/slider_widget.dart';
 import '../widgets/graph/weight_graph.dart';

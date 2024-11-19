@@ -8,7 +8,7 @@ import '../../../core/utils/sharedpref_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../../../data/providers/WeightNotifier.dart';
+import '../../../data/providers/weight_provider.dart';
 
 class WeightChart extends StatefulWidget {
   const WeightChart({Key? key}) : super(key: key);
