@@ -1,5 +1,6 @@
 import 'package:animated_icon/animated_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../../core/api/api_service.dart';
 import '../../core/api/nutrition_middleware.dart';
@@ -487,12 +488,12 @@ class _SmartBolusScreenState extends State<SmartBolusScreen>
           Align(
             alignment: Alignment.bottomCenter,
             child: AnimatedContainer(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeIn,
+              duration: Duration(milliseconds: 1500),
+              curve: Curves.easeInOut,
               height: currentView == 'calculatedInsulValue'
                   ? height * 0.50
                   : navigate
-                      ? (showlist ? height * 0.40 : height * 0.82)
+                      ? (showlist ? height * 0.40 : height * 1)
                       : height * 0.65,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -503,13 +504,18 @@ class _SmartBolusScreenState extends State<SmartBolusScreen>
               ),
               child: Stack(
                 children: [
-                  if (currentView == "enterbg") enterbg(height, width, context),
-                  if (currentView == "searchmeal")
-                    searchmeal(height, width, context),
-                  if (currentView == "calculatedValue")
-                    calculatedValue(height, width, context),
-                  if (currentView == "calculatedInsulValue")
-                    calculatedInsulValue(height, width, context),
+                  Visibility(
+                      visible: currentView == "enterbg",
+                      child: enterbg(height, width, context)),
+                  Visibility(
+                      visible: currentView == "searchmeal",
+                      child: searchmeal(height, width, context)),
+                  Visibility(
+                      visible: currentView == "calculatedValue",
+                      child: calculatedValue(height, width, context)),
+                  Visibility(
+                      visible: currentView == "calculatedInsulValue",
+                      child: calculatedInsulValue(height, width, context)),
                 ],
               ),
             ),
@@ -520,565 +526,585 @@ class _SmartBolusScreenState extends State<SmartBolusScreen>
   }
 
   Widget enterbg(double height, double width, BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Text(
-                'BLOOD GLUCOSE',
-                style: TextStyle(
-                  fontSize: height * 0.025,
-                  fontWeight: FontWeight.w200,
-                  color: Color.fromARGB(255, 59, 58, 58),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  'BLOOD GLUCOSE',
+                  style: TextStyle(
+                    fontSize: height * 0.025,
+                    fontWeight: FontWeight.w200,
+                    color: Color.fromARGB(255, 59, 58, 58),
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: height * 0.025,
-              ),
-              Image.asset(
-                'assets/images/BG.png',
-                height: height * 0.15,
-              ),
-              Container(
-                height: height * 0.05,
-                width: width * 0.6,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Color.fromARGB(255, 242, 242, 247),
+                SizedBox(
+                  height: height * 0.025,
                 ),
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextField(
-                    readOnly: true,
-                    style: TextStyle(color: Color.fromARGB(255, 59, 58, 58)),
-                    controller: _bgController,
-                    textAlign: TextAlign.start,
-                    decoration: InputDecoration(
-                      suffixText: 'mg/dl',
-                      border: InputBorder.none,
-                      hintText: 'ENTER BG VALUE',
-                      hintStyle: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w300,
-                          color: Color.fromARGB(255, 59, 58, 58)),
+                Image.asset(
+                  'assets/images/BG.png',
+                  height: height * 0.15,
+                ),
+                Container(
+                  height: height * 0.05,
+                  width: width * 0.6,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Color.fromARGB(255, 242, 242, 247),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: TextField(
+                      readOnly: true,
+                      style: TextStyle(color: Color.fromARGB(255, 59, 58, 58)),
+                      controller: _bgController,
+                      textAlign: TextAlign.start,
+                      decoration: InputDecoration(
+                        suffixText: 'mg/dl',
+                        border: InputBorder.none,
+                        hintText: 'ENTER BG VALUE',
+                        hintStyle: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w300,
+                            color: Color.fromARGB(255, 59, 58, 58)),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: height * 0.025,
-              ),
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      addedFood = false;
-                      navigate = true;
-                      currentView = "searchmeal";
-                    });
-                  },
-                  child: Container(
-                    height: height * 0.05,
-                    width: width * 0.3,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: const Color.fromARGB(255, 5, 53, 93),
+                SizedBox(
+                  height: height * 0.025,
+                ),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        addedFood = false;
+                        navigate = true;
+                        currentView = "searchmeal";
+                      });
+                    },
+                    child: Container(
+                      height: height * 0.05,
+                      width: width * 0.3,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(255, 5, 53, 93),
+                      ),
+                      child: Center(
+                          child: Text(
+                        'NEXT',
+                        style: TextStyle(
+                            color: Colors.white, fontSize: height * 0.015),
+                      )),
                     ),
-                    child: Center(
-                        child: Text(
-                      'NEXT',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: height * 0.015),
-                    )),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColor.backgroundColor,
-          ),
-          child: VirtualKeyboard(
-            height: height * 0.25,
-            //width: 500,
-            textColor: Colors.black,
-            textController: _bgController,
-            //customLayoutKeys: _customLayoutKeys,
-            defaultLayouts: [
-              VirtualKeyboardDefaultLayouts.Arabic,
-              VirtualKeyboardDefaultLayouts.English
-            ],
-            //reverseLayout :true,
-            type: VirtualKeyboardType.Numeric,
-          ),
-        )
-      ],
+          Container(
+            decoration: BoxDecoration(
+              color: AppColor.backgroundColor,
+            ),
+            child: VirtualKeyboard(
+              height: height * 0.25,
+              //width: 500,
+              textColor: Colors.black,
+              textController: _bgController,
+              //customLayoutKeys: _customLayoutKeys,
+              defaultLayouts: [
+                VirtualKeyboardDefaultLayouts.Arabic,
+                VirtualKeyboardDefaultLayouts.English
+              ],
+              //reverseLayout :true,
+              type: VirtualKeyboardType.Numeric,
+            ),
+          )
+        ],
+      ),
     );
   }
 
   Widget searchmeal(double height, double width, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    addedFood = false;
-                    navigate = false;
-                    currentView = "enterbg";
-                  });
-                },
-                child: Icon(
-                  Icons.arrow_back_ios_rounded,
-                  color: Color.fromARGB(255, 59, 58, 58),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    // await SystemChannels.textInput.invokeMethod('TextInput.hide');
+                
+                    setState(() {
+                            FocusScope.of(context).unfocus();
+                      addedFood = false;
+                      navigate = false;
+                      currentView = "enterbg";
+                    
+                    });
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios_rounded,
+                    color: Color.fromARGB(255, 59, 58, 58),
+                  ),
                 ),
+                Text(
+                  'SEARCH MEAL',
+                  style: TextStyle(
+                      fontSize: height * 0.025,
+                      fontWeight: FontWeight.w200,
+                      color: Color.fromARGB(255, 59, 58, 58)),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    _loadMeals();
+                    _searchMealController.clear();
+                    setState(() {
+                      showlist = true;
+
+                      currentView = "calculatedValue";
+                    });
+                  },
+                  child: Icon(
+                    Icons.forward,
+                    color: Color.fromARGB(255, 59, 58, 58),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: height * 0.02,
+            ),
+            Container(
+              height: height * 0.058,
+              width: width,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: AppColor.backgroundColor,
               ),
-              Text(
-                'ADD MEAL',
+              child: TextField(
                 style: TextStyle(
-                    fontSize: height * 0.025,
-                    fontWeight: FontWeight.w200,
-                    color: Color.fromARGB(255, 59, 58, 58)),
-              ),
-              GestureDetector(
-                onTap: () {
-                  _loadMeals();
-                  _searchMealController.clear();
+                  color: Color.fromARGB(255, 59, 58, 58),
+                  fontSize: height * 0.018,
+                  fontWeight: FontWeight.w300,
+                ),
+                controller: _searchMealController,
+                autofocus: true,
+                onChanged: (value) {
                   setState(() {
-                    showlist = true;
-
-                    currentView = "calculatedValue";
+                    _postFutureMeal = fetchFoodItem(_searchMealController.text);
                   });
                 },
-                child: Icon(
-                  Icons.forward,
-                  color: Color.fromARGB(255, 59, 58, 58),
+                decoration: InputDecoration(
+                  // label: Text(
+                  //   'Search Meal',
+                  //   style: TextStyle(
+                  //       fontSize: height * 0.018,
+                  //       fontWeight: FontWeight.w300,
+                  //       color: Color.fromARGB(255, 59, 58, 58)),
+                  // ),
+                  border: InputBorder.none,
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Color.fromARGB(255, 59, 58, 58),
+                    size: height * 0.03,
+                  ),
                 ),
               ),
-            ],
-          ),
-          SizedBox(
-            height: height * 0.02,
-          ),
-          Container(
-            height: height * 0.058,
-            width: width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: AppColor.backgroundColor,
             ),
-            child: TextField(
-              style: TextStyle(
-                color: Color.fromARGB(255, 59, 58, 58),
-                fontSize: height * 0.018,
-                fontWeight: FontWeight.w300,
-              ),
-              controller: _searchMealController,
-              onChanged: (value) {
-                setState(() {
-                  _postFutureMeal = fetchFoodItem(_searchMealController.text);
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Search Meal',
-                border: InputBorder.none,
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Color.fromARGB(255, 59, 58, 58),
-                  size: height * 0.03,
-                ),
-                hintStyle: TextStyle(
-                    fontSize: height * 0.018,
-                    fontWeight: FontWeight.w300,
-                    color: Color.fromARGB(255, 59, 58, 58)),
-              ),
+            SizedBox(
+              height: height * 0.02,
             ),
-          ),
-          SizedBox(
-            height: height * 0.02,
-          ),
-          FutureBuilder<List<FoodItem>>(
-            future: _postFutureMeal,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return ShimmereffectSmartBolus();
-              } else if (snapshot.hasError) {
-                return Center(
-                    child: Text(
-                  'Please check your internet connection',
-                  style: TextStyle(color: Color.fromARGB(255, 59, 58, 58)),
-                ));
-              } else if (!snapshot.hasData) {
-                return SizedBox();
-              } else {
-                final items = snapshot.data!;
+            FutureBuilder<List<FoodItem>>(
+              future: _postFutureMeal,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return ShimmereffectSmartBolus();
+                } else if (snapshot.hasError) {
+                  return Center(
+                      child: Text(
+                    'Please check your internet connection',
+                    style: TextStyle(color: Color.fromARGB(255, 59, 58, 58)),
+                  ));
+                } else if (!snapshot.hasData) {
+                  return SizedBox();
+                } else {
+                  final items = snapshot.data!;
 
-                return AnimationLimiter(
-                  child: Expanded(
-                    child: ListView.builder(
-                      itemCount: items.length,
-                      itemBuilder: (context, index) {
-                        final item = items[index];
+                  return AnimationLimiter(
+                    child: Expanded(
+                      child: ListView.builder(
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          final item = items[index];
 
-                        return AnimationConfiguration.staggeredList(
-                          position: index,
-                          duration: const Duration(milliseconds: 400),
-                          child: SlideAnimation(
-                            verticalOffset: 500.0,
-                            child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 5.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Color.fromARGB(255, 242, 242, 247),
-                              ),
-                              child: ExpansionTile(
-                                onExpansionChanged: (expanded) {
-                                  setState(() {
-                                    _expandedIndex = expanded ? index : null;
-                                    _quantityController.clear();
-                                  });
-                                },
-                                initiallyExpanded: _expandedIndex == index,
-                                shape: Border(),
-                                leading: Image.asset(
-                                  'assets/images/diet.png',
-                                  height: height * 0.03,
+                          return AnimationConfiguration.staggeredList(
+                            position: index,
+                            duration: const Duration(milliseconds: 400),
+                            child: SlideAnimation(
+                              verticalOffset: 500.0,
+                              child: Container(
+                                margin: EdgeInsets.symmetric(vertical: 5.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Color.fromARGB(255, 242, 242, 247),
                                 ),
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.foodName?.toUpperCase() ?? "",
-                                      style: TextStyle(
-                                        fontWeight: AppColor.lightWeight,
-                                        color:
-                                            Color.fromARGB(255, 100, 100, 100),
-                                        fontSize: height * 0.015,
+                                child: ExpansionTile(
+                                  onExpansionChanged: (expanded) {
+                                    setState(() {
+                                      _expandedIndex = expanded ? index : null;
+                                      _quantityController.clear();
+                                    });
+                                  },
+                                  initiallyExpanded: _expandedIndex == index,
+                                  shape: Border(),
+                                  leading: Image.asset(
+                                    'assets/images/diet.png',
+                                    height: height * 0.03,
+                                  ),
+                                  title: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.foodName?.toUpperCase() ?? "",
+                                        style: TextStyle(
+                                          fontWeight: AppColor.lightWeight,
+                                          color: Color.fromARGB(
+                                              255, 100, 100, 100),
+                                          fontSize: height * 0.015,
+                                        ),
                                       ),
-                                    ),
-                                    if (_expandedIndex != index)
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Cal ${item.calories},',
-                                            style: TextStyle(
-                                              fontWeight: AppColor.lightWeight,
-                                              color: Color.fromARGB(
-                                                  255, 100, 100, 100),
-                                              fontSize: height * 0.015,
+                                      if (_expandedIndex != index)
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Cal ${item.calories},',
+                                              style: TextStyle(
+                                                fontWeight:
+                                                    AppColor.lightWeight,
+                                                color: Color.fromARGB(
+                                                    255, 100, 100, 100),
+                                                fontSize: height * 0.015,
+                                              ),
+                                            ),
+                                            SizedBox(width: 5),
+                                            Text(
+                                              item.foodDescription!
+                                                  .split('-')[0],
+                                              style: TextStyle(
+                                                fontWeight:
+                                                    AppColor.lightWeight,
+                                                color: Color.fromARGB(
+                                                    255, 100, 100, 100),
+                                                fontSize: height * 0.015,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  ),
+                                  trailing: _expandedIndex == index
+                                      ? Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                          width: 80,
+                                          height: 35,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: TextField(
+                                              style: TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 100, 100, 100),
+                                              ),
+                                              controller: _quantityController,
+                                              maxLines: 1,
+                                              textAlign: TextAlign.center,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              decoration: InputDecoration(
+                                                hintText: '1',
+                                                hintStyle: TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 100, 100, 100),
+                                                ),
+                                                border: InputBorder.none,
+                                              ),
+                                              onChanged: (value) {
+                                                setState(() {});
+                                              },
                                             ),
                                           ),
-                                          SizedBox(width: 5),
-                                          Text(
-                                            item.foodDescription!.split('-')[0],
-                                            style: TextStyle(
-                                              fontWeight: AppColor.lightWeight,
-                                              color: Color.fromARGB(
-                                                  255, 100, 100, 100),
-                                              fontSize: height * 0.015,
+                                        )
+                                      : AnimateIcon(
+                                          key: ValueKey(index),
+                                          onTap: () async {
+                                            double carbs;
+                                            final match =
+                                                RegExp(r'Carbs:\s*([\d.]+)g')
+                                                    .firstMatch(
+                                                        item.foodDescription!);
+                                            try {
+                                              carbs = double.parse(
+                                                  match!.group(1).toString());
+
+                                              print(
+                                                  "initial carb value ${carbs.toString()}");
+                                            } catch (e) {
+                                              print(
+                                                  'Error parsing carbs as number: $e');
+                                              carbs = 0;
+                                            }
+
+                                            double newCarbs = carbs * 1;
+
+                                            setState(() {
+                                              addedFood = true;
+                                            });
+
+                                            await addMeal(item, quantity,
+                                                newCarbs, carbs, context);
+
+                                            _notifyUser('FOOD LOGGED');
+                                          },
+                                          iconType: IconType.animatedOnTap,
+                                          height: 40,
+                                          width: 40,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                          animateIcon: AnimateIcons.checkbox,
+                                        ),
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 15, right: 15, bottom: 10),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "Calories",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          AppColor.lightWeight,
+                                                      color: Color.fromARGB(
+                                                          255, 100, 100, 100),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${item.calories}",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          AppColor.lightWeight,
+                                                      color: Color.fromARGB(
+                                                          255, 100, 100, 100),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "Carbs",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          AppColor.lightWeight,
+                                                      color: Color.fromARGB(
+                                                          255, 100, 100, 100),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${item.carbs}",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          AppColor.lightWeight,
+                                                      color: Color.fromARGB(
+                                                          255, 100, 100, 100),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "Protein",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          AppColor.lightWeight,
+                                                      color: Color.fromARGB(
+                                                          255, 100, 100, 100),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${item.protein}",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          AppColor.lightWeight,
+                                                      color: Color.fromARGB(
+                                                          255, 100, 100, 100),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "Fats",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          AppColor.lightWeight,
+                                                      color: Color.fromARGB(
+                                                          255, 100, 100, 100),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    "${item.fat}",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          AppColor.lightWeight,
+                                                      color: Color.fromARGB(
+                                                          255, 100, 100, 100),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 15),
+                                          Center(
+                                            child: GestureDetector(
+                                              onTap: () async {
+                                                String quantity;
+                                                if (_quantityController
+                                                    .text.isNotEmpty) {
+                                                  quantity =
+                                                      _quantityController.text;
+                                                } else {
+                                                  quantity = '1';
+                                                }
+
+                                                double carbs;
+                                                final match = RegExp(
+                                                        r'Carbs:\s*([\d.]+)g')
+                                                    .firstMatch(
+                                                        item.foodDescription!);
+                                                try {
+                                                  carbs = double.parse(match!
+                                                      .group(1)
+                                                      .toString());
+
+                                                  print(
+                                                      "initial carb value ${carbs.toString()}");
+                                                } catch (e) {
+                                                  print(
+                                                      'Error parsing carbs as number: $e');
+                                                  carbs = 0;
+                                                }
+
+                                                double enteredQuantity;
+                                                try {
+                                                  enteredQuantity =
+                                                      double.parse(
+                                                          quantity.replaceAll(
+                                                              RegExp(
+                                                                  r'[^0-9.]'),
+                                                              ''));
+                                                } catch (e) {
+                                                  print(
+                                                      'Error parsing quantity as number: $e');
+                                                  enteredQuantity = 1;
+                                                }
+
+                                                double newCarbs =
+                                                    carbs * enteredQuantity;
+
+                                                await addMeal(item, quantity,
+                                                    newCarbs, carbs, context);
+                                                _loadMeals();
+                                                _searchMealController.clear();
+
+                                                _notifyUser('FOOD LOGGED');
+
+                                                setState(() {
+                                                  addedFood = true;
+
+                                                  showlist = true;
+                                                  currentView =
+                                                      "calculatedValue";
+                                                });
+                                              },
+                                              child: Container(
+                                                height: height * 0.04,
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                  border: Border.all(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .primary,
+                                                  ),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    'ADD',
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .primaryContainer,
+                                                      fontSize: height * 0.015,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
+                                    ),
                                   ],
                                 ),
-                                trailing: _expandedIndex == index
-                                    ? Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                        ),
-                                        width: 80,
-                                        height: 35,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10),
-                                          child: TextField(
-                                            style: TextStyle(
-                                              color: Color.fromARGB(
-                                                  255, 100, 100, 100),
-                                            ),
-                                            controller: _quantityController,
-                                            maxLines: 1,
-                                            textAlign: TextAlign.center,
-                                            keyboardType: TextInputType.number,
-                                            decoration: InputDecoration(
-                                              hintText: '1',
-                                              hintStyle: TextStyle(
-                                                color: Color.fromARGB(
-                                                    255, 100, 100, 100),
-                                              ),
-                                              border: InputBorder.none,
-                                            ),
-                                            onChanged: (value) {
-                                              setState(() {});
-                                            },
-                                          ),
-                                        ),
-                                      )
-                                    : AnimateIcon(
-                                        key: ValueKey(index),
-                                        onTap: () async {
-                                          double carbs;
-                                          final match =
-                                              RegExp(r'Carbs:\s*([\d.]+)g')
-                                                  .firstMatch(
-                                                      item.foodDescription!);
-                                          try {
-                                            carbs = double.parse(
-                                                match!.group(1).toString());
-
-                                            print(
-                                                "initial carb value ${carbs.toString()}");
-                                          } catch (e) {
-                                            print(
-                                                'Error parsing carbs as number: $e');
-                                            carbs = 0;
-                                          }
-
-                                          double newCarbs = carbs * 1;
-
-                                          setState(() {
-                                            addedFood = true;
-                                          });
-
-                                          await addMeal(item, quantity,
-                                              newCarbs, carbs, context);
-
-                                          _notifyUser('FOOD LOGGED');
-                                        },
-                                        iconType: IconType.animatedOnTap,
-                                        height: 40,
-                                        width: 40,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                        animateIcon: AnimateIcons.checkbox,
-                                      ),
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 15, right: 15, bottom: 10),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Calories",
-                                                  style: TextStyle(
-                                                    fontWeight:
-                                                        AppColor.lightWeight,
-                                                    color: Color.fromARGB(
-                                                        255, 100, 100, 100),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "${item.calories}",
-                                                  style: TextStyle(
-                                                    fontWeight:
-                                                        AppColor.lightWeight,
-                                                    color: Color.fromARGB(
-                                                        255, 100, 100, 100),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Carbs",
-                                                  style: TextStyle(
-                                                    fontWeight:
-                                                        AppColor.lightWeight,
-                                                    color: Color.fromARGB(
-                                                        255, 100, 100, 100),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "${item.carbs}",
-                                                  style: TextStyle(
-                                                    fontWeight:
-                                                        AppColor.lightWeight,
-                                                    color: Color.fromARGB(
-                                                        255, 100, 100, 100),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Protein",
-                                                  style: TextStyle(
-                                                    fontWeight:
-                                                        AppColor.lightWeight,
-                                                    color: Color.fromARGB(
-                                                        255, 100, 100, 100),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "${item.protein}",
-                                                  style: TextStyle(
-                                                    fontWeight:
-                                                        AppColor.lightWeight,
-                                                    color: Color.fromARGB(
-                                                        255, 100, 100, 100),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Fats",
-                                                  style: TextStyle(
-                                                    fontWeight:
-                                                        AppColor.lightWeight,
-                                                    color: Color.fromARGB(
-                                                        255, 100, 100, 100),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "${item.fat}",
-                                                  style: TextStyle(
-                                                    fontWeight:
-                                                        AppColor.lightWeight,
-                                                    color: Color.fromARGB(
-                                                        255, 100, 100, 100),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 15),
-                                        Center(
-                                          child: GestureDetector(
-                                            onTap: () async {
-                                              String quantity;
-                                              if (_quantityController
-                                                  .text.isNotEmpty) {
-                                                quantity =
-                                                    _quantityController.text;
-                                              } else {
-                                                quantity = '1';
-                                              }
-
-                                              double carbs;
-                                              final match = RegExp(
-                                                      r'Carbs:\s*([\d.]+)g')
-                                                  .firstMatch(
-                                                      item.foodDescription!);
-                                              try {
-                                                carbs = double.parse(
-                                                    match!.group(1).toString());
-
-                                                print(
-                                                    "initial carb value ${carbs.toString()}");
-                                              } catch (e) {
-                                                print(
-                                                    'Error parsing carbs as number: $e');
-                                                carbs = 0;
-                                              }
-
-                                              double enteredQuantity;
-                                              try {
-                                                enteredQuantity = double.parse(
-                                                    quantity.replaceAll(
-                                                        RegExp(r'[^0-9.]'),
-                                                        ''));
-                                              } catch (e) {
-                                                print(
-                                                    'Error parsing quantity as number: $e');
-                                                enteredQuantity = 1;
-                                              }
-
-                                              double newCarbs =
-                                                  carbs * enteredQuantity;
-
-                                              await addMeal(item, quantity,
-                                                  newCarbs, carbs, context);
-                                              _loadMeals();
-                                              _searchMealController.clear();
-
-                                              _notifyUser('FOOD LOGGED');
-
-                                              setState(() {
-                                                addedFood = true;
-
-                                                showlist = true;
-                                                currentView = "calculatedValue";
-                                              });
-                                            },
-                                            child: Container(
-                                              height: height * 0.04,
-                                              width: double.infinity,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
-                                                border: Border.all(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  'ADD',
-                                                  style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .primaryContainer,
-                                                    fontSize: height * 0.015,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                );
-              }
-            },
-          ),
-          SizedBox(height: 20),
-        ],
+                  );
+                }
+              },
+            ),
+            SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

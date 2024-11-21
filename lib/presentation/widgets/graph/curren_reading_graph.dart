@@ -1,4 +1,5 @@
 
+import 'package:animated_icon/animated_icon.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../core/api/api_config.dart';
@@ -18,6 +19,7 @@ double insulinDose = 0.0;
 double insulinLevel = 0.0;
 double glucoseMeter = 0.0;
 String updateDate = '';
+bool refreshActive = false;
 
   Future<void> getCurrentData() async {
     final dio = Dio();
@@ -77,21 +79,47 @@ updateDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'CURRENT READING',
+                  "TODAY'S READING",
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primaryContainer,
                     fontSize: height * 0.015,
                     fontWeight: AppColor.weight600,
                   ),
                 ),
-                Text(
-                  'Last Updated $updateDate',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    fontSize: height * 0.01,
-                    fontWeight: AppColor.weight600,
+                Row(
+                    children: [
+                      Text(
+                        refreshActive ? 'Refreshing..' : 'Tap to Refresh',
+                        style: TextStyle(
+                          color:
+                              Theme.of(context).colorScheme.secondaryContainer,
+                          fontSize: height * 0.014,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(
+                        width: width * 0.02,
+                      ),
+                      AnimateIcon(
+                        onTap: () {
+                                  getCurrentData();
+                          setState(() {
+                            refreshActive = true;
+                          });
+                          Future.delayed(Duration(seconds: 1), () {
+                            setState(() {
+                              refreshActive = false;
+                            });
+                          });
+                        },
+                        iconType: IconType.animatedOnTap,
+                        height: height * 0.02,
+                        width: width * 0.04,
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        animateIcon: AnimateIcons.refresh,
+                      ),
+                    ],
                   ),
-                ),
               ],
             ),
             SizedBox(

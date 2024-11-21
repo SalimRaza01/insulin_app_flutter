@@ -324,7 +324,7 @@ class _GlucoseScreenState extends State<GlucoseScreen> {
               child: AnimatedContainer(
                 duration: Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
-                height: currentView == "enterbg" ? height * 0.6 : height * 0.45,
+                height: currentView == "enterbg" ? height * 0.65 : height * 0.45,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
@@ -21,6 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool toggleDarkmode = false;
   SharedPrefsHelper prefs = SharedPrefsHelper();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  File? _image;
 
   @override
   void initState() {
@@ -45,6 +48,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     prefs.putBool('isProfileCompleted', false);
     prefs.putBool('isDeviceSetup', false);
     prefs.putBool('darkMode', false);
+    prefs.putImageFile('profileImage', _image!);
   }
 
   @override

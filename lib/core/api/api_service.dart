@@ -290,7 +290,8 @@ Future<void> addBolusUnit(String unit, BuildContext context) async {
       'unit': unit,
     });
     if (response.statusCode == 200) {
-      insulinUnit(_sharedPreference.getDouble('dose').toString(), context);
+      insulinUnit(unit, context);
+      // insulinUnit(_sharedPreference.getDouble('dose').toString(), context);
 
       Provider.of<Bolusdelivery>(context, listen: false).updateStatus(true);
 
@@ -333,11 +334,7 @@ Future<void> addGlucoseUnit(String unit, BuildContext context) async {
       'unit': unit,
     });
     if (response.statusCode == 200) {
-      print('delivered glucose unit $unit');
-      insulinUnit(_sharedPreference.getDouble('dose').toString(), context);
-      print(
-          ' delivered insul value ${_sharedPreference.getDouble('dose').toString()}');
-      print('API HIT GLUCOSE ADDED');
+insulinUnit(unit, context);
 
       Provider.of<GlucoseDelivery>(context, listen: false).glucoseUpdate(true);
 
@@ -384,18 +381,18 @@ Future<List<Citymodel>> getCityList(state) async {
 }
 
 Future<void> addBasal(
-    String endTimeController, String dosage, BuildContext context) async {
+    String endTimeController, String unit, BuildContext context) async {
   final _sharedPreference = SharedPrefsHelper();
   final dio = Dio();
   final String? userId = await _sharedPreference.getString('userId');
-  print('dosage');
+  print('unit');
   try {
     final response = await dio.post('$postBasalData/$userId', data: {
       'time': endTimeController,
-      'unit': dosage,
+      'unit': unit,
     });
     if (response.statusCode == 200) {
-      insulinUnit(dosage, context);
+    insulinUnit(unit, context);
 
       Provider.of<BasalDelivery>(context, listen: false).updateBasalGraph(true);
       print(response);
@@ -435,7 +432,7 @@ Future<void> smartBolusApi(String unit, BuildContext context) async {
       'unit': unit,
     });
     if (response.statusCode == 200) {
-      insulinUnit(_sharedPreference.getDouble('dose').toString(), context);
+      insulinUnit(unit, context);
       Provider.of<SmartBolusDelivery>(context, listen: false)
           .updateSmartBolusValue(true);
 

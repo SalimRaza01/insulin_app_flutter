@@ -1,17 +1,15 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import 'dart:convert';
 import '../../core/api/api_service.dart';
 import '../../core/services/bluetooth_service_provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/sharedpref_utils.dart';
-import '../../core/utils/popover_bottomsheet.dart';
 import '../widgets/buttoms_widget.dart';
 import '../widgets/drawer_widget.dart';
 import '../widgets/graph/bolus_graph.dart';
-
 
 class DoseEntry {
   final double dose;
@@ -50,8 +48,6 @@ class _BolusWizardState extends State<BolusWizard> {
   final prefs = SharedPrefsHelper();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   double initialInsulinValue = 0.0;
-
-  
 
   @override
   void initState() {
@@ -121,27 +117,27 @@ class _BolusWizardState extends State<BolusWizard> {
       context: _scaffoldKey.currentContext!,
       barrierDismissible: false,
       builder: (BuildContext context) {
-         Future.delayed(Duration(seconds: 2), () {
-      if (_bleManager.ackNotifier.value == true) {
-        ins = double.parse(activeInsulinController.text);
-        dose = ins;
-        _saveInitialValue(dose);
-        addBolusUnit(activeInsulinController.text, context);
-        activeInsulinController.clear();
+        Future.delayed(Duration(seconds: 2), () {
+          if (_bleManager.ackNotifier.value == true) {
+            ins = double.parse(activeInsulinController.text);
+            dose = ins;
+            _saveInitialValue(dose);
+            addBolusUnit(activeInsulinController.text, context);
+            activeInsulinController.clear();
 
-        setState(() {
-          doseHistory.insert(
-              0, DoseEntry(dose: dose, timestamp: DateTime.now()));
+            setState(() {
+              doseHistory.insert(
+                  0, DoseEntry(dose: dose, timestamp: DateTime.now()));
+            });
+
+            _saveDoseHistory();
+            Navigator.pop(context);
+            _successDialogBox();
+          } else {
+            Navigator.pop(context);
+            _failedDialogBox();
+          }
         });
-
-        _saveDoseHistory();
-        Navigator.pop(context);
-        _successDialogBox();
-      } else {
-                Navigator.pop(context);
-        _failedDialogBox();
-      }
-    });
         return AlertDialog(
           title: Text(
             'BOLUS STATUS',
@@ -172,7 +168,6 @@ class _BolusWizardState extends State<BolusWizard> {
         );
       },
     );
-   
   }
 
   _successDialogBox() async {
@@ -181,7 +176,6 @@ class _BolusWizardState extends State<BolusWizard> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         Future.delayed(Duration(seconds: 2), () {
-       
           Navigator.pop(context);
         });
         return AlertDialog(
@@ -209,9 +203,9 @@ class _BolusWizardState extends State<BolusWizard> {
         );
       },
     );
-      setState(() {
-         _bleManager.ackNotifier.value == false;
-      });
+    setState(() {
+      _bleManager.ackNotifier.value == false;
+    });
   }
 
   _failedDialogBox() {
@@ -248,7 +242,7 @@ class _BolusWizardState extends State<BolusWizard> {
         );
       },
     );
-  } 
+  }
 
   @override
   void dispose() {
@@ -262,560 +256,565 @@ class _BolusWizardState extends State<BolusWizard> {
     final width = MediaQuery.of(context).size.width;
 
     return ValueListenableBuilder(
-      valueListenable:  _bleManager.isDeviceConnected,
-      builder: (BuildContext context, dynamic isDeviceConnected, Widget? child) {
-      return Scaffold(
-        key: _scaffoldKey,
-        drawer: AppDrawerNavigation('INSULIN'),
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.white),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(
-                size: 30,
-                Icons.history,
-                color: Colors.white,
-              ),
-              tooltip: 'Comment Icon',
-              onPressed: () {
-                _loadDoseHistory();
-                doseHistory.isNotEmpty
-                    ? showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return Popover(
-                            height: height * 0.4,
-                            child: StatefulBuilder(
-                              builder: (BuildContext context, setState) {
-                                return Padding(
-                                    padding: EdgeInsets.only(
-                                        right: 30,
-                                        left: 30,
-                                        bottom: 10,
-                                        top: 11),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Bolus History",
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onInverseSurface,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: height * 0.02),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                setState(
-                                                  () {
-                                                    _deleteSharedPreference();
-                                                  },
-                                                );
-                                                Navigator.pop(context);
-                                              },
-                                              icon: Icon(
-                                                Icons.delete,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onInverseSurface,
-                                              ),
-                                            )
-                                          ],
+        valueListenable: _bleManager.isDeviceConnected,
+        builder:
+            (BuildContext context, dynamic isDeviceConnected, Widget? child) {
+          return Scaffold(
+            key: _scaffoldKey,
+            drawer: AppDrawerNavigation('INSULIN'),
+            backgroundColor: Theme.of(context).colorScheme.onPrimary,
+            appBar: AppBar(
+              iconTheme: IconThemeData(color: Colors.white),
+              // actions: <Widget>[
+              //   IconButton(
+              //     icon: Icon(
+              //       size: 30,
+              //       Icons.history,
+              //       color: Colors.white,
+              //     ),
+              //     tooltip: 'Comment Icon',
+              //     onPressed: () {
+              //       _loadDoseHistory();
+              //       doseHistory.isNotEmpty
+              //           ? showModalBottomSheet(
+              //               context: context,
+              //               builder: (context) {
+              //                 return Popover(
+              //                   height: height * 0.4,
+              //                   child: StatefulBuilder(
+              //                     builder: (BuildContext context, setState) {
+              //                       return Padding(
+              //                           padding: EdgeInsets.only(
+              //                               right: 30,
+              //                               left: 30,
+              //                               bottom: 10,
+              //                               top: 11),
+              //                           child: Column(
+              //                             children: [
+              //                               Row(
+              //                                 mainAxisAlignment:
+              //                                     MainAxisAlignment.spaceBetween,
+              //                                 children: [
+              //                                   Text(
+              //                                     "Bolus History",
+              //                                     style: TextStyle(
+              //                                         color: Theme.of(context)
+              //                                             .colorScheme
+              //                                             .onInverseSurface,
+              //                                         fontWeight: FontWeight.bold,
+              //                                         fontSize: height * 0.02),
+              //                                   ),
+              //                                   IconButton(
+              //                                     onPressed: () {
+              //                                       setState(
+              //                                         () {
+              //                                           _deleteSharedPreference();
+              //                                         },
+              //                                       );
+              //                                       Navigator.pop(context);
+              //                                     },
+              //                                     icon: Icon(
+              //                                       Icons.delete,
+              //                                       color: Theme.of(context)
+              //                                           .colorScheme
+              //                                           .onInverseSurface,
+              //                                     ),
+              //                                   )
+              //                                 ],
+              //                               ),
+              //                               Padding(
+              //                                 padding: const EdgeInsets.symmetric(
+              //                                     vertical: 0),
+              //                                 child: Row(
+              //                                   mainAxisAlignment:
+              //                                       MainAxisAlignment.spaceBetween,
+              //                                   children: [
+              //                                     Text(
+              //                                       'Dosage',
+              //                                       style: TextStyle(
+              //                                         color: Theme.of(context)
+              //                                             .colorScheme
+              //                                             .onInverseSurface,
+              //                                       ),
+              //                                     ),
+              //                                     Text(
+              //                                       'Date',
+              //                                       style: TextStyle(
+              //                                         color: Theme.of(context)
+              //                                             .colorScheme
+              //                                             .onInverseSurface,
+              //                                       ),
+              //                                     ),
+              //                                     Text(
+              //                                       'Time',
+              //                                       style: TextStyle(
+              //                                         color: Theme.of(context)
+              //                                             .colorScheme
+              //                                             .onInverseSurface,
+              //                                       ),
+              //                                     ),
+              //                                   ],
+              //                                 ),
+              //                               ),
+              //                               SizedBox(
+              //                                 width: width,
+              //                                 child: Divider(
+              //                                   thickness: 1,
+              //                                   color: Colors.grey,
+              //                                 ),
+              //                               ),
+              //                               SingleChildScrollView(
+              //                                 child: Container(
+              //                                   height: height * 0.24,
+              //                                   child: ListView.builder(
+              //                                     itemCount: doseHistory.length,
+              //                                     itemBuilder:
+              //                                         (BuildContext context,
+              //                                             int index) {
+              //                                       final entry =
+              //                                           doseHistory[index];
+              //                                       final formattedTime =
+              //                                           DateFormat('HH:mm').format(
+              //                                               entry.timestamp);
+              //                                       final formattedDate =
+              //                                           DateFormat('dd-MMM-yy')
+              //                                               .format(
+              //                                                   entry.timestamp);
+              //                                       return Padding(
+              //                                         padding: const EdgeInsets
+              //                                             .symmetric(vertical: 10),
+              //                                         child: Row(
+              //                                           mainAxisAlignment:
+              //                                               MainAxisAlignment
+              //                                                   .spaceBetween,
+              //                                           children: [
+              //                                             Text(
+              //                                               ' Dose ${entry.dose}',
+              //                                               style: TextStyle(
+              //                                                 color: Theme.of(
+              //                                                         context)
+              //                                                     .colorScheme
+              //                                                     .onInverseSurface,
+              //                                               ),
+              //                                             ),
+              //                                             Text(
+              //                                               formattedDate,
+              //                                               style: TextStyle(
+              //                                                 color: Theme.of(
+              //                                                         context)
+              //                                                     .colorScheme
+              //                                                     .onInverseSurface,
+              //                                               ),
+              //                                             ),
+              //                                             Text(
+              //                                               formattedTime,
+              //                                               style: TextStyle(
+              //                                                 color: Theme.of(
+              //                                                         context)
+              //                                                     .colorScheme
+              //                                                     .onInverseSurface,
+              //                                               ),
+              //                                             ),
+              //                                           ],
+              //                                         ),
+              //                                       );
+              //                                     },
+              //                                   ),
+              //                                 ),
+              //                               )
+              //                             ],
+              //                           ));
+              //                     },
+              //                   ),
+              //                 );
+              //               },
+              //             )
+              //           : _notifyUser('No History Found');
+              //     },
+              //   ),
+              // ],
+              backgroundColor: Theme.of(context).colorScheme.secondary,
+              bottom: isDeviceConnected == false
+                  ? PreferredSize(
+                      preferredSize: Size.fromHeight(35),
+                      child: Container(
+                        height: 35,
+                        color: Colors.redAccent,
+                        child: Center(
+                          child: Text(
+                            'DEVICE NOT CONNECTED',
+                            style: TextStyle(
+                              fontSize: height * 0.015,
+                              fontWeight: FontWeight.w500,
+                              color: Color.fromARGB(255, 255, 255, 255),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : PreferredSize(
+                      preferredSize: Size.fromHeight(0),
+                      child: SizedBox(),
+                    ),
+            ),
+            body: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Bolus Wizard',
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.tertiary,
+                              fontSize: height * 0.03),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: height * 0.01,
+                    ),
+                    Bolusgraph(),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
+                        SizedBox(
+                          child: Text(
+                            'Basal Wizard automatically calculate the recommended dosage of insulin based on your meal intake',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.tertiary,
+                                fontSize: height * 0.012),
+                          ),
+                          width: width * 0.8,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: height * 0.02,
+                    ),
+                    isDeviceConnected
+                        ? Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "INSULIN",
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .tertiary,
+                                        fontSize: 16),
+                                  ),
+                                  Icon(
+                                    Icons.info_outline,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
+                                  ),
+                                  SizedBox(
+                                    width: 100,
+                                    height: 30,
+                                    child: TextField(
+                                      cursorColor: Theme.of(context)
+                                          .colorScheme
+                                          .onInverseSurface,
+                                      selectionControls:
+                                          CupertinoTextSelectionControls(),
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onInverseSurface),
+                                      onTapOutside: (PointerDownEvent event) {
+                                        FocusManager.instance.primaryFocus
+                                            ?.unfocus();
+                                      },
+                                      controller: activeInsulinController,
+                                      keyboardType: TextInputType.number,
+                                      textAlign: TextAlign.right,
+                                      decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: '0 unit',
+                                          hintStyle: TextStyle(
+                                              fontWeight: AppColor.lightWeight,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onInverseSurface)),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 4),
+                                    child: Container(
+                                      height: 40,
+                                      width: 2,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    child: Icon(
+                                      Icons.edit,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .tertiary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        : inActiveTextFields(context, 'INSULIN', height),
+                    SizedBox(
+                      height: height * 0.04,
+                    ),
+                    Center(
+                      child: isDeviceConnected == true &&
+                              activeInsulinController.text.isNotEmpty
+                          ? Buttons(
+                              action: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return Scaffold(
+                                      backgroundColor:
+                                          Theme.of(context).colorScheme.primary,
+                                      body: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(20),
+                                            topRight: Radius.circular(20),
+                                          ),
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 0),
-                                          child: Row(
+                                        height: 650,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20),
+                                          child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
-                                                'Dosage',
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onInverseSurface,
-                                                ),
-                                              ),
-                                              Text(
-                                                'Date',
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onInverseSurface,
-                                                ),
-                                              ),
-                                              Text(
-                                                'Time',
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onInverseSurface,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: width,
-                                          child: Divider(
-                                            thickness: 1,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        SingleChildScrollView(
-                                          child: Container(
-                                            height: height * 0.24,
-                                            child: ListView.builder(
-                                              itemCount: doseHistory.length,
-                                              itemBuilder:
-                                                  (BuildContext context,
-                                                      int index) {
-                                                final entry =
-                                                    doseHistory[index];
-                                                final formattedTime =
-                                                    DateFormat('HH:mm').format(
-                                                        entry.timestamp);
-                                                final formattedDate =
-                                                    DateFormat('dd-MMM-yy')
-                                                        .format(
-                                                            entry.timestamp);
-                                                return Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(vertical: 10),
-                                                  child: Row(
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
                                                             .spaceBetween,
                                                     children: [
                                                       Text(
-                                                        ' Dose ${entry.dose}',
+                                                        'Recommendation',
                                                         style: TextStyle(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .onInverseSurface,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        formattedDate,
-                                                        style: TextStyle(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .onInverseSurface,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                        formattedTime,
-                                                        style: TextStyle(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .colorScheme
-                                                              .onInverseSurface,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .tertiary,
+                                                          fontSize:
+                                                              height * 0.03,
+                                                          fontWeight:
+                                                              FontWeight.w600,
                                                         ),
                                                       ),
                                                     ],
                                                   ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ));
-                              },
-                            ),
-                          );
-                        },
-                      )
-                    : _notifyUser('No History Found');
-              },
-            ),
-          ],
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          bottom: isDeviceConnected == false
-              ? PreferredSize(
-                  preferredSize: Size.fromHeight(35),
-                  child: Container(
-                    height: 35,
-                    color: Colors.redAccent,
-                    child: Center(
-                      child: Text(
-                        'DEVICE NOT CONNECTED',
-                        style: TextStyle(
-                          fontSize: height * 0.015,
-                          fontWeight: FontWeight.w500,
-                          color: Color.fromARGB(255, 255, 255, 255),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              : PreferredSize(
-                  preferredSize: Size.fromHeight(0),
-                  child: SizedBox(),
-                ),
-        ),
-        body: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Bolus Wizard',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          fontSize: height * 0.03),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: height * 0.01,
-                ),
-                Bolusgraph(),
-                SizedBox(
-                  height: height * 0.02,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                    SizedBox(
-                      child: Text(
-                        'Basal Wizard automatically calculate the recommended dosage of insulin based on your meal intake',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.tertiary,
-                            fontSize: height * 0.012),
-                      ),
-                      width: width * 0.8,
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: height * 0.02,
-                ),
-                isDeviceConnected
-                    ? Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "INSULIN",
-                                style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    fontSize: 16),
-                              ),
-                              Icon(
-                                Icons.info_outline,
-                                color: Theme.of(context).colorScheme.tertiary,
-                              ),
-                              SizedBox(
-                                width: 100,
-                                height: 30,
-                                child: TextField(
-                                  cursorColor: Theme.of(context)
-                                      .colorScheme
-                                      .onInverseSurface,
-                                  selectionControls:
-                                      CupertinoTextSelectionControls(),
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onInverseSurface),
-                                  onTapOutside: (PointerDownEvent event) {
-                                    FocusManager.instance.primaryFocus
-                                        ?.unfocus();
-                                  },
-                                  controller: activeInsulinController,
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.right,
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: '0 unit',
-                                      hintStyle: TextStyle(
-                                          fontWeight: AppColor.lightWeight,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onInverseSurface)),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4),
-                                child: Container(
-                                  height: 40,
-                                  width: 2,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              SizedBox(
-                                child: Icon(
-                                  Icons.edit,
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ))
-                    : inActiveTextFields(context, 'INSULIN', height),
-                SizedBox(
-                  height: height * 0.04,
-                ),
-                Center(
-                  child: isDeviceConnected
-                      ? Buttons(
-                          action: () {
-                            activeInsulinController.text.isEmpty
-                                ? _notifyUser('Please Enter Insulin Dose')
-                                : showModalBottomSheet(
-                                    context: context,
-                                    builder: (context) {
-                                      return Scaffold(
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        body: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(20),
-                                              topRight: Radius.circular(20),
-                                            ),
-                                          ),
-                                          height: 650,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(20),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          'Recommendation',
-                                                          style: TextStyle(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .tertiary,
-                                                            fontSize:
-                                                                height * 0.03,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                      height: height * 0.03,
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          'Estimated Bolus Units',
-                                                          style: TextStyle(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .tertiary,
-                                                            fontSize:
-                                                                height * 0.025,
-                                                          ),
-                                                        ),
-                                                        Text(
-                                                          '${dose.toInt()} units',
-                                                          style: TextStyle(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .tertiary,
-                                                            fontSize:
-                                                                height * 0.025,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                      height: height * 0.03,
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceAround,
-                                                      children: [
-                                                        SizedBox(
-                                                          child: Icon(
-                                                            Icons.info_outline,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .tertiary,
-                                                          ),
-                                                          height: height * 0.02,
-                                                        ),
-                                                        SizedBox(
-                                                          child: Text(
-                                                            'There values are calculated on basis of input provided to bolus wizard.',
-                                                            style: TextStyle(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .colorScheme
-                                                                  .tertiary,
-                                                              fontSize: height *
-                                                                  0.015,
-                                                            ),
-                                                          ),
-                                                          width: width * 0.8,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                      height: height * 0.03,
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceAround,
-                                                      children: [
-                                                        SizedBox(
-                                                          child: Icon(
-                                                            Icons.info_outline,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .tertiary,
-                                                          ),
-                                                          height: height * 0.02,
-                                                        ),
-                                                        SizedBox(
-                                                          child: Text(
-                                                            'Use the recommended setting after taking the approval from your medical consultant (or doctor)',
-                                                            style: TextStyle(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .colorScheme
-                                                                  .tertiary,
-                                                              fontSize: height *
-                                                                  0.015,
-                                                            ),
-                                                          ),
-                                                          width: width * 0.8,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                GestureDetector(
-                                                  onTap: () async {
-                                                    setState(() {
-                                                      dose = double.parse(
-                                                          activeInsulinController
-                                                              .text);
-                                                    });
-
-                                                    _bleManager
-                                                        .readOrWriteCharacteristic(
-                                                            char, cmd, true);
-
-                                                    Navigator.pop(context);
-                                                    _waitingDialogBox();
-                                                  },
-                                                  child: Container(
-                                                    height: height * 0.06,
-                                                    width: width * 0.6,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .tertiary,
-
-                                                      // boxShadow: [
-                                                      //   BoxShadow(
-                                                      //     color: Colors.grey,
-                                                      //     blurRadius: 10,
-                                                      //   ),
-                                                      // ]
-                                                    ),
-                                                    child: Center(
-                                                        child: Text(
-                                                      'DELIVER BOLUS',
-                                                      style: TextStyle(
+                                                  SizedBox(
+                                                    height: height * 0.03,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        'Estimated Bolus Units',
+                                                        style: TextStyle(
                                                           color:
                                                               Theme.of(context)
                                                                   .colorScheme
-                                                                  .onPrimary,
+                                                                  .tertiary,
                                                           fontSize:
-                                                              height * 0.02),
-                                                    )),
+                                                              height * 0.025,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        '${dose.toInt()} units',
+                                                        style: TextStyle(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .tertiary,
+                                                          fontSize:
+                                                              height * 0.025,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
+                                                  SizedBox(
+                                                    height: height * 0.03,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      SizedBox(
+                                                        child: Icon(
+                                                          Icons.info_outline,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .tertiary,
+                                                        ),
+                                                        height: height * 0.02,
+                                                      ),
+                                                      SizedBox(
+                                                        child: Text(
+                                                          'There values are calculated on basis of input provided to bolus wizard.',
+                                                          style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .tertiary,
+                                                            fontSize:
+                                                                height * 0.015,
+                                                          ),
+                                                        ),
+                                                        width: width * 0.8,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
+                                                    height: height * 0.03,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceAround,
+                                                    children: [
+                                                      SizedBox(
+                                                        child: Icon(
+                                                          Icons.info_outline,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .tertiary,
+                                                        ),
+                                                        height: height * 0.02,
+                                                      ),
+                                                      SizedBox(
+                                                        child: Text(
+                                                          'Use the recommended setting after taking the approval from your medical consultant (or doctor)',
+                                                          style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .tertiary,
+                                                            fontSize:
+                                                                height * 0.015,
+                                                          ),
+                                                        ),
+                                                        width: width * 0.8,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  setState(() {
+                                                    dose = double.parse(
+                                                        activeInsulinController
+                                                            .text);
+                                                  });
+
+                                                  _bleManager
+                                                      .readOrWriteCharacteristic(
+                                                          char, cmd, true);
+
+                                                  Navigator.pop(context);
+                                                  _waitingDialogBox();
+                                                },
+                                                child: Container(
+                                                  height: height * 0.06,
+                                                  width: width * 0.6,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .tertiary,
+
+                                                    // boxShadow: [
+                                                    //   BoxShadow(
+                                                    //     color: Colors.grey,
+                                                    //     blurRadius: 10,
+                                                    //   ),
+                                                    // ]
+                                                  ),
+                                                  child: Center(
+                                                      child: Text(
+                                                    'DELIVER BOLUS',
+                                                    style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onPrimary,
+                                                        fontSize:
+                                                            height * 0.02),
+                                                  )),
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      );
-                                    },
-                                  );
-                          },
-                          title: 'CALCULATE',
-                        )
-                      : Center(
-                          child: Container(
-                            height: height * 0.06,
-                            width: width * 0.6,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: const Color.fromARGB(76, 158, 158, 158),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              title: 'CALCULATE',
+                            )
+                          : Center(
+                              child: Container(
+                                height: height * 0.06,
+                                width: width * 0.6,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color:
+                                      const Color.fromARGB(76, 158, 158, 158),
+                                ),
+                                child: Center(
+                                    child: Text(
+                                  'CALCULATE',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(77, 255, 255, 255),
+                                      fontSize: height * 0.02),
+                                )),
+                              ),
                             ),
-                            child: Center(
-                                child: Text(
-                              'SUBMIT',
-                              style: TextStyle(
-                                  color: Color.fromARGB(77, 255, 255, 255),
-                                  fontSize: height * 0.02),
-                            )),
-                          ),
-                        ),
-                )
-              ],
+                    )
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-      );
-    });
+          );
+        });
   }
 
   inActiveTextFields(BuildContext context, String title, double height) {

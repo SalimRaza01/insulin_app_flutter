@@ -163,220 +163,228 @@ class _HomeScreenState extends State<HomeScreen> {
                 valueListenable: _bleManager.agvaDevice,
                 builder: (context, agvaDevice, _) {
                   print('Started Listening 4 ${_bleManager.agvaDevice.value}');
-                  return Scaffold(
-                    backgroundColor: Theme.of(context).colorScheme.onPrimary,
-                    appBar: AppBar(
-                      iconTheme: IconThemeData(color: Colors.white),
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                      actions: <Widget>[
-                        GestureDetector(
-                          onTap: () => {
-                            // if (_adapterState == BluetoothAdapterState.off)
-                            //   {
-                            //     print('this show BluetoothAdapterState $_adapterState'),
-                            //     showModalBottomSheet<void>(
-                            //       context: context,
-                            //       builder: (BuildContext context) {
-                            //         return Container(
-                            //           height: height * 0.2,
-                            //           decoration: BoxDecoration(
-                            //             color: Color.fromARGB(255, 31, 29, 87),
-                            //           ),
-                            //           child: Padding(
-                            //             padding: const EdgeInsets.all(20),
-                            //             child: Row(
-                            //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            //               crossAxisAlignment: CrossAxisAlignment.start,
-                            //               children: [
-                            //                 Column(
-                            //                   crossAxisAlignment: CrossAxisAlignment.start,
-                            //                   children: [
-                            //                     Text(
-                            //                       "Bluetooth is turned off",
-                            //                       style: TextStyle(
-                            //                         fontSize: 20,
-                            //                         color: Theme.of(context)
-                            //                             .colorScheme
-                            //                             .primary,
-                            //                       ),
-                            //                     ),
-                            //                     SizedBox(
-                            //                       height: 20,
-                            //                     ),
-                            //                     Text(
-                            //                       "Please turn on your bluetooth to connect insulin ",
-                            //                       style: TextStyle(
-                            //                         fontSize: 12,
-                            //                         color: Theme.of(context)
-                            //                             .colorScheme
-                            //                             .primary,
-                            //                       ),
-                            //                     ),
-                            //                   ],
-                            //                 ),
-                            //                 Icon(
-                            //                   Icons.bluetooth_disabled,
-                            //                   size: 40,
-                            //                   color: Theme.of(context).colorScheme.primary,
-                            //                 )
-                            //               ],
-                            //             ),
-                            //           ),
-                            //         );
-                            //       },
-                            //     ),
-                            //   }
-                            print(
-                                "check connection and device $isConnected $agvaDevice"),
-                            if (isConnected == false)
-                              {
-                                print(agvaDevice),
-                                print(isConnected),
-                                print("Device not connected"),
-                                _bleManager.startScanIfNotScanning()
-                              }
-                          },
-                          child: Image.asset(
-                            // setImage(_bleManager.isDeviceConnected.value),
-                            isScanning == true
-                                ? 'assets/images/scanning.gif'
-                                :
-                            isConnected
-                                ? 'assets/images/insulin_connected.png'
-                                : 'assets/images/insulinIcon.png',
-
-                            width: 25,
+                  return ValueListenableBuilder(
+                      valueListenable: _bleManager.adapterState,
+                      builder: (context, adapterState, _) {
+                        return Scaffold(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.onPrimary,
+                          appBar: AppBar(
+                            iconTheme: IconThemeData(color: Colors.white),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary,
+                            actions: <Widget>[
+                              GestureDetector(
+                                onTap: () => {
+                                  if (adapterState == BluetoothAdapterState.off)
+                                    {
+                                      showModalBottomSheet<void>(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Container(
+                                            height: height * 0.2,
+                                            decoration: BoxDecoration(
+                                              color: Color.fromARGB(255, 5, 53, 93)
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(20),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Bluetooth is turned off",
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              height * 0.022,
+                                                          color:
+                                                             Colors.white
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: height * 0.02,
+                                                      ),
+                                                      Text(
+                                                        "Please turn on your bluetooth to connect insulin ",
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              height * 0.012,
+                                                          color:
+                                                             Colors.white
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Icon(
+                                                    Icons.bluetooth_disabled,
+                                                    size: height * 0.04,
+                                                    color: Colors.white
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    },
+                                  if (isConnected == false)
+                                    {
+                                      print(agvaDevice),
+                                      print(isConnected),
+                                      print("Device not connected"),
+                                      _bleManager.startScanIfNotScanning()
+                                    }
+                                },
+                                child: Image.asset(
+                                  isScanning == true
+                                      ? 'assets/images/scanning.gif'
+                                      : isConnected
+                                          ? 'assets/images/insulin_connected.png'
+                                          : 'assets/images/insulinIcon.png',
+                                  width: 25,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 25,
+                              ),
+                              GestureDetector(
+                                onTap: _addBloodCount,
+                                child: Image.asset(
+                                  'assets/images/notifi.png',
+                                  height: 22,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 20,
+                              )
+                            ],
                           ),
-                        ),
-                        SizedBox(
-                          width: 25,
-                        ),
-                        GestureDetector(
-                          onTap: _addBloodCount,
-                          child: Image.asset(
-                            'assets/images/notifi.png',
-                            height: 22,
+                          body: SingleChildScrollView(
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: Column(
+                                children: [
+                                  //Today's_Status_Widget
+                                  SizedBox(height: height * 0.020),
+                                  GestureDetector(child: TodaysStatus()),
+
+                                  SizedBox(height: height * 0.015),
+                                  //Avarage_Insulin_Intake_Widget
+
+                                  GestureDetector(
+                                      onTap: () {
+                                        if (isConnected) {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      SmartBolusScreen()));
+                                        } else {
+                                          _noDeviceFoundTopModel();
+                                        }
+                                      },
+                                      child: SmartBolusWidget()),
+
+                                  SizedBox(height: height * 0.015),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    NutritionScreen()));
+                                      },
+                                      child: newMethod(height, width)),
+
+                                  SizedBox(height: height * 0.015),
+
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    WeightScreen()));
+                                      },
+                                      child: WeightChart()),
+
+                                  SizedBox(height: height * 0.015),
+
+                                  //GlucoseChart_Widget
+                                  GestureDetector(
+                                      onTap: () {
+                                        if (isConnected) {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      GlucoseScreen()));
+                                        } else {
+                                          _noDeviceFoundTopModel();
+                                        }
+                                      },
+                                      child: Glucosechart()),
+
+                                  SizedBox(height: height * 0.015),
+                                  GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    InsulinScreen()));
+                                      },
+                                      child: Insulinchart()),
+
+                                  SizedBox(height: height * 0.015),
+                                  //InsulinkChart_Widget
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  BasalWizard()));
+                                    },
+                                    child: Basalgraph(),
+                                  ),
+                                  SizedBox(height: height * 0.015),
+
+                                  GestureDetector(
+                                    onTap: () async {
+                                      await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  BolusWizard()));
+                                    },
+                                    child: Bolusgraph(),
+                                  ),
+                                  SizedBox(height: height * 0.015),
+
+                                  RessorvoirWidget(),
+
+                                  SizedBox(height: height * 0.015),
+                                  //Bettery_Widget
+                                  BatteryStatus(),
+                                  SizedBox(height: height * 0.015),
+                                  //Patch_Widget
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        )
-                      ],
-                    ),
-                    body: SingleChildScrollView(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Column(
-                          children: [
-                            //Today's_Status_Widget
-                            SizedBox(height: height * 0.020),
-                            GestureDetector(child: TodaysStatus()),
-
-                            SizedBox(height: height * 0.015),
-                            //Avarage_Insulin_Intake_Widget
-
-                            GestureDetector(
-                                onTap: () {
-                                  if (isConnected) {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                SmartBolusScreen()));
-                                  } else {
-                                    _noDeviceFoundTopModel();
-                                  }
-                                },
-                                child: SmartBolusWidget()),
-
-                            SizedBox(height: height * 0.015),
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              NutritionScreen()));
-                                },
-                                child: newMethod(height, width)),
-
-                            SizedBox(height: height * 0.015),
-
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              WeightScreen()));
-                                },
-                                child: WeightChart()),
-
-                            SizedBox(height: height * 0.015),
-
-                            //GlucoseChart_Widget
-                            GestureDetector(
-                                onTap: () {
-                                  if (isConnected) {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                GlucoseScreen()));
-                                  } else {
-                                    _noDeviceFoundTopModel();
-                                  }
-                                },
-                                child: Glucosechart()),
-
-                            SizedBox(height: height * 0.015),
-                            GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              InsulinScreen()));
-                                },
-                                child: Insulinchart()),
-
-                            SizedBox(height: height * 0.015),
-                            //InsulinkChart_Widget
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => BasalWizard()));
-                              },
-                              child: Basalgraph(),
-                            ),
-                            SizedBox(height: height * 0.015),
-
-                            GestureDetector(
-                              onTap: () async {
-                                await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => BolusWizard()));
-                              },
-                              child: Bolusgraph(),
-                            ),
-                            SizedBox(height: height * 0.015),
-
-                            RessorvoirWidget(),
-
-                            SizedBox(height: height * 0.015),
-                            //Bettery_Widget
-                            BatteryStatus(),
-                            SizedBox(height: height * 0.015),
-                            //Patch_Widget
-                          ],
-                        ),
-                      ),
-                    ),
-                    drawer: AppDrawerNavigation('HOMESCREEN'),
-                  );
+                          drawer: AppDrawerNavigation('HOMESCREEN'),
+                        );
+                      });
                 },
               );
             },
@@ -571,7 +579,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> popupDevice(
       BuildContext context, BluetoothDevice device, BleManager bleManager) {
-        print('POPUP Showen');
+    print('POPUP Showen');
     return showModalBottomSheet<void>(
         context: context,
         isDismissible: false,
@@ -739,18 +747,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (value != null) setState(() => _topModalData = value);
   }
 
-  Future _showDeviceModal() async {
-    final value = await showTopModalSheet<String?>(
-      context,
-      DeviceStatusModal(),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      borderRadius: const BorderRadius.vertical(
-        bottom: Radius.circular(20),
-      ),
-    );
-
-    if (value != null) setState(() => _deviceStatus = value);
-  }
 }
 
 class InsulinTopModel extends StatelessWidget {
@@ -890,146 +886,161 @@ class BloodCount extends StatelessWidget {
                           final width = MediaQuery.of(context).size.width;
                           return StatefulBuilder(builder:
                               (BuildContext context, StateSetter setState) {
-                            return Container(
-                              height: height * 0.36,
-                              width: width,
-                              child: Padding(
-                                padding: EdgeInsets.all(20),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: width * 0.03,
-                                            ),
-                                            Icon(Icons.water_drop_outlined),
-                                            SizedBox(
-                                              width: width * 0.03,
-                                            ),
-                                            SizedBox(
-                                              width: width / 6,
-                                              child: TextField(
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                cursorColor: Theme.of(context)
-                                                    .colorScheme
-                                                    .onInverseSurface,
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onInverseSurface,
-                                                ),
-                                                controller:
-                                                    bloodCountController,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    hintText:
-                                                        'Enter Blood Count'
-                                                            .toUpperCase(),
-                                                    hintStyle: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w200)),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: height * 0.01,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: width * 0.03,
-                                            ),
-                                            Icon(Icons.water_drop_outlined),
-                                            SizedBox(
-                                              width: width * 0.03,
-                                            ),
-                                            SizedBox(
-                                              width: width / 6,
-                                              child: TextField(
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                cursorColor: Theme.of(context)
-                                                    .colorScheme
-                                                    .onInverseSurface,
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onInverseSurface,
-                                                ),
-                                                controller:
-                                                    bloodPressureController,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    hintText:
-                                                        'Enter Blood Pressure'
-                                                            .toUpperCase(),
-                                                    hintStyle: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w200)),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: height * 0.05,
-                                    ),
-                                    Center(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          pref.putString('BloodSugarCount',
-                                              bloodCountController.text);
-                                          pref.putString('BloodPressure',
-                                              bloodPressureController.text);
-                                          Navigator.pop(context);
-                                        },
+                            return AnimatedContainer(
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.easeIn,
+                              child: Container(
+                                height: height * 0.6,
+                                width: width,
+                                child: Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Column(
+                                    // mainAxisAlignment:
+                                    //     MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(10),
                                         child: Container(
-                                          height: height * 0.05,
-                                          width: width * 0.4,
                                           decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
                                             borderRadius:
                                                 BorderRadius.circular(10),
-                                            color:
-                                                Color.fromARGB(255, 5, 53, 93),
                                           ),
-                                          child: Center(
-                                              child: Text(
-                                            'SUBMIT',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: height * 0.02),
-                                          )),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: width * 0.03,
+                                              ),
+                                              Icon(Icons.water_drop_outlined),
+                                              SizedBox(
+                                                width: width * 0.03,
+                                              ),
+                                              SizedBox(
+                                                width: width / 2,
+                                                child: TextField(
+                                                  autofocus: true,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  cursorColor: Theme.of(context)
+                                                      .colorScheme
+                                                      .onInverseSurface,
+                                                  style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onInverseSurface,
+                                                  ),
+                                                  controller:
+                                                      bloodCountController,
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                    label: Text(
+                                                      'ENTER BC',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w200,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onInverseSurface,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(
+                                        height: height * 0.01,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: width * 0.03,
+                                              ),
+                                              Icon(Icons.water_drop_outlined),
+                                              SizedBox(
+                                                width: width * 0.03,
+                                              ),
+                                              SizedBox(
+                                                width: width / 2,
+                                                child: TextField(
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  cursorColor: Theme.of(context)
+                                                      .colorScheme
+                                                      .onInverseSurface,
+                                                  style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onInverseSurface,
+                                                  ),
+                                                  controller:
+                                                      bloodPressureController,
+                                                  decoration: InputDecoration(
+                                                    border: InputBorder.none,
+                                                    label: Text(
+                                                      'ENTER BP',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w200,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onInverseSurface,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: height * 0.03,
+                                      ),
+                                      Center(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            pref.putString('BloodSugarCount',
+                                                bloodCountController.text);
+                                            pref.putString('BloodPressure',
+                                                bloodPressureController.text);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            height: height * 0.05,
+                                            width: width * 0.4,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: Color.fromARGB(
+                                                  255, 5, 53, 93),
+                                            ),
+                                            child: Center(
+                                                child: Text(
+                                              'SUBMIT',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: height * 0.02),
+                                            )),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
@@ -1054,43 +1065,6 @@ class BloodCount extends StatelessWidget {
   }
 }
 
-class DeviceStatusModal extends StatelessWidget {
-  const DeviceStatusModal({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: Color.fromARGB(255, 4, 137, 239)),
-      child: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              SizedBox(
-                height: 30,
-              ),
-              Text(
-                "Bluetooth is turned off",
-                style: TextStyle(
-                    fontSize: 20, color: Theme.of(context).colorScheme.primary),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Please turn your Bluetooth",
-                style: TextStyle(
-                    fontSize: 10, color: Theme.of(context).colorScheme.primary),
-              ),
-            ]),
-            Icon(Icons.bluetooth_disabled)
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 final pilateColor = const Color.fromARGB(255, 255, 0, 92); // Fat
 final cyclingColor = const Color.fromARGB(255, 0, 156, 156); // Protein

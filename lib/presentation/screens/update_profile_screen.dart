@@ -5,7 +5,6 @@ import '../../core/theme/app_colors.dart';
 import '../../core/utils/sharedpref_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
 import '../../core/utils/popover_bottomsheet.dart';
 import '../../data/models/city_model.dart';
 import '../../data/models/state_model.dart';
