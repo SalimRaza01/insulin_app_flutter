@@ -18,7 +18,7 @@ class BleManager extends ChangeNotifier {
 
   List<BluetoothService>? _services = [];
   final String characteristicUuid = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
-  String finalString = 'cm+sync';
+  String finalString = 'cm+hs';
 
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
   late StreamSubscription<bool> _isScanningStream;
@@ -65,12 +65,12 @@ class BleManager extends ChangeNotifier {
     agvaDevice.value = device;
     notifyListeners();
 
- Future.delayed(Duration(seconds: 3),(){
-     if (isDeviceConnected.value == true) {
+    Future.delayed(Duration(seconds: 3), () {
+      if (isDeviceConnected.value == true) {
         agvaDevice.value = null;
-      notifyListeners();
-    } 
- });
+        notifyListeners();
+      }
+    });
   }
 
   void disconnectDevice(BluetoothDevice? device) async {
@@ -89,7 +89,7 @@ class BleManager extends ChangeNotifier {
         agvaDevice.value = null;
         notifyListeners();
         timer.cancel();
-        startScanIfNotScanning(); // Restart scan on disconnection
+        startScanIfNotScanning();
       }
     });
   }
@@ -105,14 +105,62 @@ class BleManager extends ChangeNotifier {
   }
 
   Future<void> readOrWriteCharacteristic(
+
       String characteristicUuid, String text, bool isRead) async {
     try {
       BluetoothCharacteristic? characteristic =
           findCharacteristic(characteristicUuid);
+
       if (characteristic != null) {
         await characteristic.write(utf8.encode(text), withoutResponse: false);
         if (isRead) {
           var data = await characteristic.read();
+          var dataDecoded = utf8.decode(data);
+          var startIndex = "IN@";
+          var endIndex = "#";
+          if(dataDecoded.startsWith(startIndex) && dataDecoded.endsWith(endIndex)){
+           var finalData =  dataDecoded.split("|");
+
+           for(final data in finalData){
+            print(data[1]);
+           }
+           print(finalData);
+          }
+          print("DataPacket found $dataDecoded");
+
+
+
+
+//   var data = "IN@123,44,12,44,33,53,663,23,45,65|33,53,663,23,45,65,16,75,23|32,44,232,665,112,841#";
+//   var startIndex = "IN@";
+//   List<List<String>> bolusPacket = [];
+//   List<List<String>> basalPacket = [];
+//   List<List<String>> smartBolus = [];
+//   var checkData = data.substring(startIndex.length, data.length - 1);
+//   print("The check data is $checkData");
+//   var finalData = checkData.split("|");
+//   var lists = <List<String>>[];
+// print("the final Data is ${finalData}");
+//   for (var values in finalData) {
+//     var subList = values.split(",");
+//     lists.add(subList);
+//   }
+//   for (var i = 0; i < lists.length; i++) {
+//     if (i == 0) {
+//       bolusPacket.add(lists[i]);
+//     } else if (i == 1) {
+//       basalPacket.add(lists[i]);
+//     } else if (i == 2) {
+//       smartBolus.add(lists[i]);
+//     }
+//   }
+//   // Display the packets
+//   print("The Bolus packet is $bolusPacket");
+//   print("The Basal packet is $basalPacket");
+//   print("The smartBolus packet is $smartBolus");
+
+
+
           print('ack found2 ${ackNotifier.value}');
           if (utf8.decode(data).contains('ACK')) {
             ackNotifier.value = true;

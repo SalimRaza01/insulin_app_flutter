@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:newproject/presentation/screens/home_screen.dart';
+import 'package:INSUL/presentation/screens/home_screen.dart';
 import 'package:simple_ripple_animation/simple_ripple_animation.dart';
 import '../../core/api/api_service.dart';
 import '../../core/services/bluetooth_service_provider.dart';

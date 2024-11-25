@@ -529,7 +529,7 @@ class _BasalWizardState extends State<BasalWizard> {
                                           Container(
                                             height: 200,
                                             child: CupertinoDatePicker(
-                                                initialDateTime: starttime,
+                                            initialDateTime: DateTime.now(),
                                                 mode: CupertinoDatePickerMode
                                                     .time,
                                                 use24hFormat: true,
@@ -930,6 +930,7 @@ class _BasalWizardState extends State<BasalWizard> {
                                   startTimeController.clear();
                                   endTimeController.clear();
                                   dosageController.clear();
+                            
                                 }
                               },
                               title: 'SUBMIT',

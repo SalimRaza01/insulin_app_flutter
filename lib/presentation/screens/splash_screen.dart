@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:newproject/presentation/screens/sign_in_screen.dart';
-import 'package:newproject/presentation/screens/home_screen.dart';
+import 'package:INSUL/presentation/screens/sign_in_screen.dart';
+import 'package:INSUL/presentation/screens/home_screen.dart';
 import '../../core/utils/sharedpref_utils.dart';
 
 class Splashscreen extends StatefulWidget {

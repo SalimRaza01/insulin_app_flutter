@@ -84,7 +84,7 @@ class MyApp extends StatelessWidget {
               ? ThemeMode.dark
               : ThemeMode.light,
           debugShowCheckedModeBanner: false,
-          initialRoute: "/SplashScreen",
+          initialRoute: "/HomeScreen",
           routes: {
             "/SplashScreen": (context) => Splashscreen(),
             "/HomeScreen": (context) => HomeScreen(),

@@ -4,8 +4,8 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:newproject/presentation/screens/glucose_screen.dart';
-import 'package:newproject/presentation/screens/smartbolus_screen.dart';
+import 'package:INSUL/presentation/screens/glucose_screen.dart';
+import 'package:INSUL/presentation/screens/smartbolus_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:top_modal_sheet/top_modal_sheet.dart';
@@ -893,7 +893,7 @@ class BloodCount extends StatelessWidget {
                                 height: height * 0.6,
                                 width: width,
                                 child: Padding(
-                                  padding: EdgeInsets.all(20),
+                                  padding: EdgeInsets.all(10),
                                   child: Column(
                                     // mainAxisAlignment:
                                     //     MainAxisAlignment.spaceBetween,
@@ -1009,7 +1009,7 @@ class BloodCount extends StatelessWidget {
                                         ),
                                       ),
                                       SizedBox(
-                                        height: height * 0.03,
+                                        height: height * 0.02,
                                       ),
                                       Center(
                                         child: GestureDetector(

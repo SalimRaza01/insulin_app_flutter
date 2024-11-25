@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:newproject/data/models/nutrition_donut_model.dart';
+import 'package:INSUL/data/models/nutrition_donut_model.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:virtual_keyboard_multi_language/virtual_keyboard_multi_language.dart';

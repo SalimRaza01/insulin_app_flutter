@@ -61,9 +61,29 @@ class _ReportScreenState extends State<ReportScreen> {
            reportGenerateDate = DateFormat('dd-MM-yyyy').format(DateTime.parse(data['createdAt'].toString()));
         });
       } else {
+        setState(() {
+          totalBasalValue = '-';
+          totalBolusValue = '-';
+          totalGlucoseValue = '-';
+          totalInsulValue  = '-';
+          patientName = '-';
+          patientAge = '-';
+          patientGender  = '-';
+           reportGenerateDate = '-';
+        });
         throw Exception('Failed to load');
       }
     } catch (e) {
+       setState(() {
+          totalBasalValue = '-';
+          totalBolusValue = '-';
+          totalGlucoseValue = '-';
+          totalInsulValue  = '-';
+          patientName = '-';
+          patientAge = '-';
+          patientGender  = '-';
+           reportGenerateDate = '-';
+        });
       print('Error fetching data: $e');
       rethrow;
     }
