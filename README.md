@@ -25,10 +25,16 @@ Welcome to **INSUL**, a powerful, Flutter-based mobile application designed to s
 ### 🌗 Dark & Light Mode
 - **User Customization**: Choose between dark and light modes to enhance readability and comfort.
 
-## 🔧 Technology
+
+## 🛠️ Technology Stack
 
 - **Flutter**: Provides a smooth, cross-platform experience on Android and iOS.
-- **Bluetooth Low Energy (BLE)**: Connects seamlessly to insulin pumps for continuous data monitoring.
-- **Cross-Platform**: Fully optimized for Android and iOS devices.
+- **Bluetooth Low Energy (BLE)**: Connects seamlessly to insulin pumps and other health monitoring devices for continuous data streaming.
+- **Multiprovider**: Efficient state management using multiple providers in Flutter.
+- **Dio**: Powerful HTTP client for API interactions, supporting interceptors, global configuration, and network requests.
+- **Firebase Cloud Messaging (FCM)**: Push notifications to alert users about important events like insulin pump status or health updates.
+- **Background Service**: Executes long-running tasks (e.g., data syncing, notifications) even when the app is in the background.
+- **Syncfusion Charts**: Advanced charting solutions for visualizing glucose levels, insulin dosages, and other health-related data.
+- **Razorpay**: Payment gateway integration for processing secure payments, in-app purchases, and subscriptions.
 
 INSUL is your trusted companion for accessible, smart diabetes management—whether you're managing meals, tracking glucose levels, or adjusting insulin doses.
